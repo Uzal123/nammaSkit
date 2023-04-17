@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Quicksand', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}
+
+$navbar-width: 14rem;
+$topbar-height: 4rem;
+
+.navbar {
+  width: $navbar-width;
+  height: 100vh;
+
+  .active {
+    @apply bg-gray-900 text-white;
+  }
+
+  .inactive {
+    @apply text-gray-300 hover:bg-gray-700 hover:text-white;
+  }
+}
+
+.topbar {
+  height: $topbar-height;
+  width: calc(100vw - $navbar-width);
+  @apply shadow-md;
+}
+
+.main-container {
+  width: calc(100vw - $navbar-width);
+  height: calc(100vh - $topbar-height);
+  @apply p-3;
+}
+
+.notification{
+  bottom: 0;
+  transform: translateY(-50%);
+  animation: slide-up 1s ease-in-out forwards, disappear 1s 5s forwards;
+}
+
+@keyframes slide-up {
+  0% {
+    transform: translateY(100%);
+  }
+  50% {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes disappear {
+  100% {
+    opacity: 0;
+  }
+}

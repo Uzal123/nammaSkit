@@ -1,7 +1,10 @@
 import { create } from "zustand";
 import { IUser } from "../interface/IUser";
+import { ROLES, Roles } from "../assets/roles";
 
 interface AuthStore {
+  isAuthenticated: boolean;
+  isLoading: boolean;
   user: IUser;
   setUser: (
     token: string,
@@ -9,18 +12,21 @@ interface AuthStore {
     email: string,
     firstName: string,
     phone: string,
-    role: string
+    role: Roles
   ) => void;
-  removeUser: (center: { lat: number; lng: number }) => void;
+  removeUser: () => void;
+  setAuthenticatedUser: () => void;
 }
 
 const useStore = create<AuthStore>((set) => ({
+  isAuthenticated: false,
+  isLoading: true,
   user: {
     id: "",
     firstName: "",
     email: "",
     phone: "",
-    role: "",
+    role: undefined
   },
   setUser: (
     token: string,
@@ -28,12 +34,14 @@ const useStore = create<AuthStore>((set) => ({
     email: string,
     firstName: string,
     phone: string,
-    role: string
+    role: Roles
   ) => {
     if (token) {
       localStorage.setItem("skit-user-token", token);
     }
     set((state) => ({
+      isAuthenticated: true,
+      isLoading: false,
       user: {
         ...state,
         phone: phone,
@@ -46,15 +54,23 @@ const useStore = create<AuthStore>((set) => ({
   },
   removeUser: () => {
     localStorage.removeItem("skit-user-token");
-    set({
+    set((state) => ({
+      isAuthenticated: false,
+      isLoading: false,
       user: {
         id: "",
         firstName: "",
         email: "",
         phone: "",
-        role: "",
+        role: undefined
       },
-    });
+    }));
+  },
+  setAuthenticatedUser: () => {
+    set((state) => ({
+      isAuthenticated: false,
+      isLoading: false,
+    }));
   },
 }));
 

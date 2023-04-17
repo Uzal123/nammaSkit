@@ -2,12 +2,19 @@ import { useMutation } from "@apollo/client";
 import { useEffect, useState } from "react";
 import LOGIN from "../../graphql/mutation/login.";
 import { useUserStore } from "../../store/auth";
+import { useRouter } from "next/router";
+import { useNotificationStore } from "../../store/notification";
+import { v4 as uuidv4 } from "uuid";
 
 const LoginPage = () => {
   const [loginInput, setLoginInput] = useState({ phone: "", password: "" });
 
-  const user = useUserStore((state) => state.user);
-  const setUser = useUserStore((state) => state.setUser);
+  const router = useRouter();
+
+  const user = useUserStore((state: { user: any }) => state.user);
+  const setUser = useUserStore((state: { setUser: any }) => state.setUser);
+
+  const { setNotification } = useNotificationStore((state: any) => state);
 
   const handleString = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -24,11 +31,15 @@ const LoginPage = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(loginInput);
-    if (!loading) {
-      login({
-        variables: loginInput,
-      });
+    try {
+      console.log(loginInput);
+      if (!loading) {
+        login({
+          variables: loginInput,
+        });
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -40,15 +51,31 @@ const LoginPage = () => {
         user._id,
         user.phone,
         user.firstName,
-        user.role,
-        user.email
+        user.email,
+        user.role
       );
-      console.log("logged in")
+      setNotification({
+        id: uuidv4(),
+        message: "Logged in successfully",
+        status: "Success",
+        duration: 3000,
+      });
     }
     if (data?.login?.success == false) {
-      alert(data.login.message);
+      setNotification({
+        id: uuidv4(),
+        message: data.login.message,
+        status: "Error",
+        duration: 3000,
+      });
     }
   }, [data]);
+
+  useEffect(() => {
+    if (user.id) {
+      router.push("/");
+    }
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -118,7 +145,7 @@ const LoginPage = () => {
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
-                Sign in
+                {loading ? "Signing in..." : "Sign in"}
               </button>
             </div>
           </form>

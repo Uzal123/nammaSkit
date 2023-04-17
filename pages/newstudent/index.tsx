@@ -1,0 +1,344 @@
+import { useState } from "react";
+import Input from "../../components/forminput";
+import CREATE_STUDENT from "../../graphql/mutation/createStudent";
+import AppLayout from "../../layouts/applayout";
+import { client } from "../../graphql/client";
+import AuthLayout from "../../layouts/authlayout";
+import { useNotificationStore } from "../../store/notification";
+import { v4 as uuidv4 } from "uuid";
+
+type AllowedDepartment = "cse" | "me";
+
+interface FormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  role: "st";
+  phone: number | "";
+  semester: string | "";
+  gender: string | "";
+  usn: string | "";
+  currentAddress: string | "";
+  dob: string | "";
+  category: string | "";
+  department: AllowedDepartment;
+  admissionYear: string | "";
+  fatherName: string | "";
+  motherName: string | "";
+  parentPhone: string | "";
+  parentOccupation: string | "";
+  anualIncome: string | "";
+  entranceExamMarks: string | "";
+  parmanentAddress: string | "";
+  course: string;
+}
+
+const allowedDepartments: AllowedDepartment[] = ["cse", "me"];
+
+const SignUpForm = () => {
+  const [formData, setFormData] = useState<FormData>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    role: "st",
+    phone: "",
+    semester: "",
+    gender: "",
+    usn: "",
+    currentAddress: "",
+    dob: "",
+    category: "",
+    department: "me",
+    admissionYear: "",
+    fatherName: "",
+    motherName: "",
+    parentPhone: "",
+    parentOccupation: "",
+    anualIncome: "",
+    entranceExamMarks: "",
+    parmanentAddress: "",
+    course: "",
+  });
+
+  const { setNotification } = useNotificationStore((state: any) => state);
+
+  const [loading, setLoading] = useState(false);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({ ...prevState, [name]: value }));
+  };
+
+  const handleFloat = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseFloat(e.target.value);
+    const key = e.target.name;
+    setFormData((prevState) => ({ ...prevState, [key]: val }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await client.mutate({
+        mutation: CREATE_STUDENT,
+        variables: { createStudentInput: formData },
+      });
+
+      console.log(response);
+      if (response.data.createStudent.success === true) {
+        setLoading(false);
+        setNotification({
+          id: uuidv4(),
+          message: "Student Created Successfully",
+          status: "Success",
+          duration: 3000,
+        });
+      } else {
+        setLoading(false);
+        setNotification({
+          id: uuidv4(),
+          message: `Error: ${response.data.createStudent.message}`,
+          status: "Error",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    }
+  };
+
+  return (
+    <AuthLayout>
+      <AppLayout>
+        <div className="h-full w-full overflow-y-auto px-10">
+          <h1 className="text-2xl font-semibold py-2">Add new Student</h1>
+          <form onSubmit={handleSubmit} className="">
+            <div className="flex w-full md:w-1/3 py-2 mb-2 border-b-2">
+              <h2 className="font-semibold text-lg text-gray-700">
+                Students Details
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              <Input
+                label="First Name"
+                name="firstName"
+                type="text"
+                value={formData.firstName}
+                onChange={handleInputChange}
+                required
+              />
+              <Input
+                label="Last Name"
+                name="lastName"
+                type="text"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                required
+              />
+              <Input
+                label="USN"
+                name="usn"
+                type="text"
+                value={formData.usn}
+                onChange={handleInputChange}
+              />
+              <Input
+                label="Gender"
+                name="gender"
+                type="text"
+                value={formData.gender}
+                onChange={handleInputChange}
+              />
+              <Input
+                label="Email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+              />
+              <Input
+                label="Phone"
+                name="phone"
+                type="number"
+                value={formData.phone}
+                onChange={handleFloat}
+              />
+              <Input
+                label="Semester"
+                name="semester"
+                type="text"
+                value={formData.semester}
+                onChange={handleInputChange}
+              />
+              <div className="mb-4">
+                <label
+                  htmlFor="department"
+                  className="block mb-2 font-medium text-md"
+                >
+                  Department
+                </label>
+                <select
+                  id="department"
+                  name="department"
+                  value={formData.department}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
+                >
+                  <option value="">Select a department</option>
+                  {allowedDepartments.map((department) => (
+                    <option key={department} value={department}>
+                      {department}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <Input
+                label="Course"
+                name="course"
+                type="text"
+                value={formData.course}
+                onChange={handleInputChange}
+              />
+              <Input
+                label="Admission Year"
+                name="admissionYear"
+                type="text"
+                value={formData.admissionYear}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="flex w-full md:w-1/3 py-2 mb-2 border-b-2">
+              <h2 className="font-semibold text-lg text-gray-700">
+                Personal Details
+              </h2>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <Input
+                label="Date of Birth"
+                name="dob"
+                type="text"
+                value={formData.dob}
+                onChange={handleInputChange}
+              />
+              <Input
+                label="Category"
+                name="category"
+                type="text"
+                value={formData.category}
+                onChange={handleInputChange}
+              />
+              <Input
+                label="Father's Name"
+                name="fatherName"
+                type="text"
+                value={formData.fatherName}
+                onChange={handleInputChange}
+              />
+              <Input
+                label="Mother's Name"
+                name="motherName"
+                type="text"
+                value={formData.motherName}
+                onChange={handleInputChange}
+              />
+              <Input
+                label="Parent's Occupation"
+                name="parentOccupation"
+                type="text"
+                value={formData.parentOccupation}
+                onChange={handleInputChange}
+              />
+
+              <Input
+                label="Annual Income"
+                name="anualIncome"
+                type="text"
+                value={formData.anualIncome}
+                onChange={handleInputChange}
+              />
+              <Input
+                label="Entrance Exam Marks"
+                name="entranceExamMarks"
+                type="text"
+                value={formData.entranceExamMarks}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="flex w-full md:w-1/3 py-2 mb-2 border-b-2">
+              <h2 className="font-semibold text-lg text-gray-700">
+                Contact Details
+              </h2>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <div>
+                <Input
+                  label="Parent's Phone"
+                  name="parentPhone"
+                  type="text"
+                  value={formData.parentPhone}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+              <Input
+                label="Current Address"
+                name="currentAddress"
+                type="text"
+                value={formData.currentAddress}
+                onChange={handleInputChange}
+              />
+
+              <Input
+                label="Permanent Address"
+                name="parmanentAddress"
+                type="text"
+                value={formData.parmanentAddress}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="w-1/3">
+              <div className="flex w-full py-2 mb-2 border-b-2">
+                <h2 className="font-semibold text-lg text-gray-700">
+                  Login Details
+                </h2>
+              </div>
+              <p className="py-1">
+                Phone number for Login :{" "}
+                <span className="font-semibold">{formData.phone}</span>
+              </p>
+
+              <Input
+                label="Password"
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
+            <div className="col-span-3">
+              <button
+                type="submit"
+                className=" px-6 float-right py-2 text-white bg-blue-500 rounded-md focus:bg-blue-600 focus:outline-none hover:bg-blue-600 hover:font-semibold"
+              >
+                {loading ? "Submitting" : "Submit"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </AppLayout>
+    </AuthLayout>
+  );
+};
+
+export default SignUpForm;
