@@ -35,6 +35,16 @@ type Student = {
   semester: string;
 };
 
+type Teacher = {
+  _id: string;
+  user: User;
+  department: string;
+  designation: string;
+  qualification: string;
+  experience: string;
+  address: string;
+};
+
 interface Props {
   student: Student;
 }
