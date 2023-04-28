@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import React from "react";
+import { useUserStore } from "../store/auth";
 
 interface Student {
   usn: string;
@@ -27,7 +28,16 @@ const StudentTable: React.FC<Props> = ({ students, isLoading = false }) => {
     return <p>No students found.</p>;
   }
 
+  const { user } = useUserStore();
+
   const router = useRouter();
+
+  const onClick = (userId: string, role: string) => {
+    router.push({
+      pathname: `/profile/q`,
+      query: { id: userId, role: role },
+    });
+  };
 
   console.log(students);
   return (
@@ -74,25 +84,25 @@ const StudentTable: React.FC<Props> = ({ students, isLoading = false }) => {
           <tr key={student.user._id}>
             <td
               className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 hover:text-indigo-600"
-              onClick={() => router.push(`/profile/${student.user._id}`)}
+              onClick={() => onClick(student.user._id, "st")}
             >
               {student.usn}
             </td>
             <td
               className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer hover:text-indigo-600"
-              onClick={() => router.push(`/profile/${student.user._id}`)}
+              onClick={() => onClick(student.user._id, "st")}
             >
               {student.user.firstName + " " + student.user.lastName}
             </td>
             <td
               className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer hover:text-indigo-600"
-              onClick={() => router.push(`/profile/${student.user._id}`)}
+              onClick={() => onClick(student.user._id, "st")}
             >
               {student.user.email}
             </td>
             <td
               className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer hover:text-indigo-600"
-              onClick={() => router.push(`/profile/${student.user._id}`)}
+              onClick={() => onClick(student.user._id, "st")}
             >
               {student.user.phone}
             </td>
@@ -100,9 +110,15 @@ const StudentTable: React.FC<Props> = ({ students, isLoading = false }) => {
               {student.department}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                Edit
-              </a>
+              {user.role === "pr" ? (
+                <a href="#" className="text-indigo-600 hover:text-indigo-900">
+                Update Results
+                </a>
+              ) : (
+                <a href="#" className="text-indigo-600 hover:text-indigo-900">
+                  Edit
+                </a>
+              )}
             </td>
           </tr>
         ))}

@@ -6,6 +6,4 @@ export enum ROLES {
   "Proctor" = "pr",
 }
 
-
-export type Roles = keyof typeof ROLES;
-
+;

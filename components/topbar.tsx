@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { ROLES, Roles } from "../assets/roles";
 import { BsChevronDown } from "react-icons/bs";
 import { useUserStore } from "../store/auth";
 import { useRouter } from "next/router";
@@ -14,9 +13,6 @@ const Topbar: React.FC = () => {
     (state: { removeUser: any }) => state.removeUser
   );
 
- if(user.role){
-    console.log(ROLES[user.role])
- }
 
   const { setNotification } = useNotificationStore((state: any) => state);
 
@@ -34,7 +30,7 @@ const Topbar: React.FC = () => {
           <div className="rounded-full h-10 w-10 bg-gray-600"></div>
           <div>
             <p className="font-semibold">{user.firstName}</p>
-            {/* {user.role && <p className="text-xs">Role: {ROLES[(user.role)]}</p>} */}
+            {user.role && <p className="text-xs">Role: {user.role}</p>}
           </div>
         </div>
 

@@ -1,41 +1,28 @@
 import { useRouter } from "next/router";
 import React from "react";
 
-interface Teacher {
-  usn: string;
-  user: {
-    _id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    role: string;
-  };
-  department: string;
+interface Subject {
+  subjectName: string;
+  subjectCode: string;
+  subjectCredits: number | undefined;
+  subjectType: string | undefined;
 }
 
 interface Props {
-  teachers: Teacher[];
+  subjects: Subject[];
   isLoading?: boolean;
 }
 
-const TeacherTable: React.FC<Props> = ({ teachers, isLoading = false }) => {
+const SubjectsTable: React.FC<Props> = ({ subjects, isLoading = false }) => {
   if (isLoading) {
     return <p>Loading...</p>;
   }
 
-  if (!teachers || teachers.length === 0) {
-    return <p>No teachers found.</p>;
+  if (!subjects || subjects.length === 0) {
+    return <p>No Subjects Available.</p>;
   }
 
   const router = useRouter();
-
-  const onClick = (userId: string, role: string) => {
-    router.push({
-      pathname: `/profile/q`,
-      query: { id: userId, role: role },
-    });
-  };
 
   return (
     <table className="divide-y w-full divide-gray-200">
@@ -45,25 +32,25 @@ const TeacherTable: React.FC<Props> = ({ teachers, isLoading = false }) => {
             scope="col"
             className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >
-            Full Name
+            Subject Code
           </th>
           <th
             scope="col"
             className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >
-            Email
+            Subject Name
           </th>
           <th
             scope="col"
             className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >
-            Phone
+            Subject Type
           </th>
           <th
             scope="col"
             className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >
-            Department
+            Credits
           </th>
           <th scope="col" className="relative px-6 py-3">
             <span className="sr-only">Edit</span>
@@ -71,28 +58,19 @@ const TeacherTable: React.FC<Props> = ({ teachers, isLoading = false }) => {
         </tr>
       </thead>
       <tbody className="bg-white divide-y divide-gray-200">
-        {teachers.map((teacher) => (
-          <tr key={teacher.user._id}>
-            <td
-              className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-              onClick={() => onClick(teacher.user._id, teacher.user.role)}
-            >
-              {teacher.user.firstName + " " + teacher.user.lastName}
-            </td>
-            <td
-              className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-              onClick={() => onClick(teacher.user._id, teacher.user.role)}
-            >
-              {teacher.user.email}
-            </td>
-            <td
-              className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-              onClick={() => onClick(teacher.user._id, teacher.user.role)}
-            >
-              {teacher.user.phone}
+        {subjects.map((subject) => (
+          <tr key={subject.subjectCode}>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {subject.subjectCode}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {teacher.department}
+              {subject.subjectName}
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {subject.subjectType}
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {subject.subjectCredits}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
               <a href="#" className="text-indigo-600 hover:text-indigo-900">
@@ -106,4 +84,4 @@ const TeacherTable: React.FC<Props> = ({ teachers, isLoading = false }) => {
   );
 };
 
-export default TeacherTable;
+export default SubjectsTable;

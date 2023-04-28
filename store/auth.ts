@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { IUser } from "../interface/IUser";
-import { ROLES, Roles } from "../assets/roles";
 
 interface AuthStore {
   isAuthenticated: boolean;
@@ -12,7 +11,7 @@ interface AuthStore {
     email: string,
     firstName: string,
     phone: string,
-    role: Roles
+    role: string
   ) => void;
   removeUser: () => void;
   setAuthenticatedUser: () => void;
@@ -26,7 +25,7 @@ const useStore = create<AuthStore>((set) => ({
     firstName: "",
     email: "",
     phone: "",
-    role: undefined
+    role: "",
   },
   setUser: (
     token: string,
@@ -34,7 +33,7 @@ const useStore = create<AuthStore>((set) => ({
     email: string,
     firstName: string,
     phone: string,
-    role: Roles
+    role: string
   ) => {
     if (token) {
       localStorage.setItem("skit-user-token", token);
@@ -62,7 +61,7 @@ const useStore = create<AuthStore>((set) => ({
         firstName: "",
         email: "",
         phone: "",
-        role: undefined
+        role: "",
       },
     }));
   },

@@ -1,34 +1,39 @@
 import { gql } from "@apollo/client";
 
-const GET_STUDENT_BY_ID = gql`query GetStudentByUserId($userId: String!) {
-  getStudentByUserId(userId: $userId) {
-    _id
-    user {
-      firstName
-      _id
-      role
-      email
-      verifiedPhone
-      gender
-      lastName
-      phone
+const GET_STUDENT_BY_ID = gql`
+  query GetStudentByUserId($userId: String!) {
+    getStudentByUserId(userId: $userId) {
+      success
+      message
+      student {
+        _id
+        usn
+        currentAddress
+        user {
+          firstName
+          lastName
+          gender
+          role
+          email
+          phone
+          _id
+        }
+        dob
+        category
+        department
+        admissionYear
+        motherName
+        fatherName
+        parentPhone
+        parentOccupation
+        anualIncome
+        parmanentAddress
+        entranceExamMarks
+        course
+        semester
+      }
     }
-    semester
-    course
-    parmanentAddress
-    entranceExamMarks
-    anualIncome
-    parentOccupation
-    parentPhone
-    motherName
-    fatherName
-    admissionYear
-    department
-    category
-    dob
-    currentAddress
-    usn
   }
-}`;
+`;
 
 export default GET_STUDENT_BY_ID;
