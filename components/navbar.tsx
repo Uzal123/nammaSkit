@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import Navlink from "./navlink";
 import { RxDashboard } from "react-icons/rx";
 import { HiUsers } from "react-icons/hi";
@@ -17,24 +17,56 @@ const Navbar: React.FC = () => {
           <RxDashboard />
           Dashboard
         </Navlink>
-        {user.role === ("ad" || "hod") && (
-          <Navlink exact href={"/users"}>
-            <HiUsers />
-            Users
-          </Navlink>
-        )}
-        {user.role === ("ad" || "hod") && (
-          <Navlink exact href={"/courses"}>
-            <GiNotebook />
-            Courses
-          </Navlink>
+
+        {user.role === "ad" && (
+          <Fragment>
+            <Navlink exact href={"/users"}>
+              <HiUsers />
+              Users
+            </Navlink>
+            <Navlink exact href={"/courses"}>
+              <GiNotebook />
+              Courses
+            </Navlink>
+          </Fragment>
         )}
 
-        {user.role === ("pr" || "fa") && (
-          <Navlink exact href={"/users"}>
-            <HiUsers />
-            My Students
-          </Navlink>
+        {user.role === "hod" && (
+          <Fragment>
+            <Navlink exact href={"/users"}>
+              <HiUsers />
+              My Department
+            </Navlink>
+            <Navlink exact href={"/courses"}>
+              <GiNotebook />
+              Courses
+            </Navlink>
+          </Fragment>
+        )}
+
+        {user.role === "pr" && (
+          <Fragment>
+            <Navlink exact href={"/users"}>
+              <HiUsers />
+              My Students
+            </Navlink>
+            <Navlink exact href={"/courses"}>
+              <GiNotebook />
+              Courses
+            </Navlink>
+          </Fragment>
+        )}
+        {user.role === "fa" && (
+          <Fragment>
+            <Navlink exact href={"/users"}>
+              <HiUsers />
+              My Students
+            </Navlink>
+            <Navlink exact href={"/courses"}>
+              <GiNotebook />
+              Courses
+            </Navlink>
+          </Fragment>
         )}
 
         <Navlink exact href={"/settings"}>

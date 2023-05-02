@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Input from "../../components/forminput";
 import CREATE_STUDENT from "../../graphql/mutation/createStudent";
 import AppLayout from "../../layouts/applayout";
@@ -6,8 +6,16 @@ import { client } from "../../graphql/client";
 import AuthLayout from "../../layouts/authlayout";
 import { useNotificationStore } from "../../store/notification";
 import { v4 as uuidv4 } from "uuid";
+import GET_ALL_DEPTS from "../../graphql/query/getalldepartments";
 
 type AllowedDepartment = "cse" | "me";
+
+export interface Department {
+  _id: string;
+  deptName: string;
+  hod?: string;
+  hodId?: string;
+}
 
 interface FormData {
   firstName: string;
@@ -62,15 +70,36 @@ const SignUpForm = () => {
     course: "",
   });
 
+  const [departments, setDepartments] = useState<Department[]>([]);
+
   const { setNotification } = useNotificationStore((state: any) => state);
 
   const [loading, setLoading] = useState(false);
+
+  const [sameAddress, setSameAddress] = useState(false);
+
+  const getalldepartments = async () => {
+    try {
+      const response = await client.query({
+        query: GET_ALL_DEPTS,
+      });
+      console.log(response);
+      if (response.data.getDepartment.success === true) {
+        setDepartments(response.data.getDepartment.results);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({ ...prevState, [name]: value }));
+    if (sameAddress === true && name === "currentAddress") {
+      setFormData((prevState) => ({ ...prevState, parmanentAddress: value }));
+    }
   };
 
   const handleFloat = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,6 +140,14 @@ const SignUpForm = () => {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    getalldepartments();
+  }, []);
+
+  useEffect(() => {
+    console.log(departments);
+  }, [departments]);
 
   return (
     <AuthLayout>
@@ -193,9 +230,9 @@ const SignUpForm = () => {
                   className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
                 >
                   <option value="">Select a department</option>
-                  {allowedDepartments.map((department) => (
-                    <option key={department} value={department}>
-                      {department}
+                  {departments.map((dept) => (
+                    <option key={dept._id} value={dept._id}>
+                      {dept.deptName}
                     </option>
                   ))}
                 </select>
@@ -224,7 +261,7 @@ const SignUpForm = () => {
               <Input
                 label="Date of Birth"
                 name="dob"
-                type="text"
+                type="date"
                 value={formData.dob}
                 onChange={handleInputChange}
               />
@@ -296,14 +333,37 @@ const SignUpForm = () => {
                 value={formData.currentAddress}
                 onChange={handleInputChange}
               />
+              <div className="mb-4">
+                <div className="flex justify-between">
+                  <label
+                    htmlFor="parmanentAddress"
+                    className="block mb-2 font-medium text-md"
+                  >
+                    Permanent Address
+                  </label>
 
-              <Input
-                label="Permanent Address"
-                name="parmanentAddress"
-                type="text"
-                value={formData.parmanentAddress}
-                onChange={handleInputChange}
-              />
+                  <p
+                    onClick={() => setSameAddress(!sameAddress)}
+                    className="text-sm cursor-pointer text-gray-500 hover:text-gray-700"
+                  >
+                    Same as current
+                  </p>
+                </div>
+
+                <input
+                  id="parmanentAddress"
+                  name="parmanentAddress"
+                  type="text"
+                  value={
+                    sameAddress
+                      ? formData.currentAddress
+                      : formData.parmanentAddress
+                  }
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
             </div>
             <div className="w-1/3">
               <div className="flex w-full py-2 mb-2 border-b-2">

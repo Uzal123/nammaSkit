@@ -98,26 +98,30 @@ const Courses = () => {
               {user.role === "ad" ? "Deparments" : "My Department"}
             </p>
           </div>
-          <div className="flex justify-between w-full border-b-2">
-            <div className="flex pt-2">
-              {dept.length > 0 &&
-                dept.map((item, index) => (
-                  <ListOfDept
-                    key={item.deptCode}
-                    deptName={item.deptName}
-                    _id={item._id}
-                    currentDept={currentDept}
-                    setCurrentDept={setCurrentDept}
-                  />
-                ))}
+          {user.role === "ad" && (
+            <div className="flex justify-between w-full border-b-2">
+              <div className="flex pt-2">
+                {dept.length > 0 &&
+                  dept.map((item, index) => (
+                    <ListOfDept
+                      key={item.deptCode}
+                      deptName={item.deptName}
+                      _id={item._id}
+                      currentDept={currentDept}
+                      setCurrentDept={setCurrentDept}
+                    />
+                  ))}
+              </div>
+
+              <button
+                className=" px-4 hover:bg-gray-400 py-2 text-gray-500 font-medium hover:text-white hover:rounded-lg "
+                onClick={() => setIsDeptModalOpen(true)}
+              >
+                Add new Department
+              </button>
             </div>
-            <button
-              className=" px-4 hover:bg-gray-400 py-2 text-gray-500 font-medium hover:text-white hover:rounded-lg "
-              onClick={() => setIsDeptModalOpen(true)}
-            >
-              Add new Department
-            </button>
-          </div>
+          )}
+
           <div className="flex justify-between pt-4">
             <p className="font-semibold text-lg">Semseters</p>
           </div>

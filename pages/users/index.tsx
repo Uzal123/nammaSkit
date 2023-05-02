@@ -29,6 +29,8 @@ const Users = () => {
     }
   );
 
+ 
+
   useEffect(() => {}, [listOf]);
 
   useEffect(() => {
@@ -40,7 +42,10 @@ const Users = () => {
       <div className=" rounded-md w-full h-full">
         <div className="flex flex-col w-full justify-center px-10 p-4">
           <div className="flex justify-between">
-            <p className="font-semibold text-lg">Users</p>
+            <p className="font-semibold text-lg">
+              {user.role === "ad" ? "Users" : "Department"}
+            </p>
+
             <div>
               {user.role === "ad" ? (
                 <button

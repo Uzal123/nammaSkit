@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { IUser } from "../interface/IUser";
+import { ROLES } from "../assets/roles";
 
 interface AuthStore {
   isAuthenticated: boolean;
@@ -11,7 +12,7 @@ interface AuthStore {
     email: string,
     firstName: string,
     phone: string,
-    role: string
+    role: ROLES
   ) => void;
   removeUser: () => void;
   setAuthenticatedUser: () => void;

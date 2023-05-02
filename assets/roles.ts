@@ -4,6 +4,4 @@ export enum ROLES {
   "Faculty" = "fa",
   "Student" = "st",
   "Proctor" = "pr",
-}
-
-;
+};

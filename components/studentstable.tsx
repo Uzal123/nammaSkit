@@ -11,15 +11,21 @@ interface Student {
     email: string;
     phone: string;
   };
+  _id: string;
   department: string;
 }
 
 interface Props {
   students: Student[];
+  onEdit?: (id: string) => React.MouseEventHandler<HTMLButtonElement>;
   isLoading?: boolean;
 }
 
-const StudentTable: React.FC<Props> = ({ students, isLoading = false }) => {
+const StudentTable: React.FC<Props> = ({
+  onEdit,
+  students,
+  isLoading = false,
+}) => {
   if (isLoading) {
     return <p>Loading...</p>;
   }
@@ -110,14 +116,16 @@ const StudentTable: React.FC<Props> = ({ students, isLoading = false }) => {
               {student.department}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              {user.role === "pr" ? (
-                <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                Update Results
-                </a>
-              ) : (
-                <a href="#" className="text-indigo-600 hover:text-indigo-900">
+              {onEdit ? (
+                <a
+                  href="#"
+                  className="text-indigo-600 hover:text-indigo-900"
+                  onClick={() => onEdit(student._id)}
+                >
                   Edit
                 </a>
+              ) : (
+                <></>
               )}
             </td>
           </tr>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Input from "../../components/forminput";
 import AppLayout from "../../layouts/applayout";
 import { client } from "../../graphql/client";
@@ -6,6 +6,8 @@ import AuthLayout from "../../layouts/authlayout";
 import { useNotificationStore } from "../../store/notification";
 import { v4 as uuidv4 } from "uuid";
 import CREATE_TEACHER from "../../graphql/mutation/createTeacher";
+import GET_ALL_DEPTS from "../../graphql/query/getalldepartments";
+import { Department } from "../newstudent";
 
 type AllowedDepartment = "cse" | "me";
 
@@ -20,13 +22,12 @@ interface FormData {
   phone: number | "";
   gender: string | "";
   address: string | "";
-  department: AllowedDepartment;
+  department: string | "";
   designation: string | "";
   qualification: string | "";
   experience: string | "";
 }
 
-const allowedDepartments: AllowedDepartment[] = ["cse", "me"];
 
 const allowedRoles: AllowedRole[] = ["fa", "hod", "pr"];
 
@@ -46,9 +47,25 @@ const SignUpForm = () => {
     experience: "",
   });
 
+   const [departments, setDepartments] = useState<Department[]>([]);
+
   const { setNotification } = useNotificationStore((state: any) => state);
 
   const [loading, setLoading] = useState(false);
+
+  const getalldepartments = async () => {
+    try {
+      const response = await client.query({
+        query: GET_ALL_DEPTS,
+      });
+      console.log(response);
+      if (response.data.getDepartment.success === true) {
+        setDepartments(response.data.getDepartment.results);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -95,6 +112,10 @@ const SignUpForm = () => {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    getalldepartments();
+  }, []);
 
   return (
     <AuthLayout>
@@ -163,9 +184,9 @@ const SignUpForm = () => {
                   className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
                 >
                   <option value="">Select a department</option>
-                  {allowedDepartments.map((department) => (
-                    <option key={department} value={department}>
-                      {department}
+                  {departments.map((dept) => (
+                    <option key={dept._id} value={dept._id}>
+                      {dept.deptName}
                     </option>
                   ))}
                 </select>
@@ -192,7 +213,7 @@ const SignUpForm = () => {
                 onChange={handleInputChange}
               />
               <Input
-                label="Experience"
+                label="Experience in years"
                 name="experience"
                 type="text"
                 value={formData.experience}
