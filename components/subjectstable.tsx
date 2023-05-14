@@ -1,11 +1,14 @@
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import SubjectModal from "../modal/SubjectModal";
 
 interface Subject {
   subjectName: string;
   subjectCode: string;
-  subjectCredits: number | undefined;
-  subjectType: string | undefined;
+  subjectCredits: number;
+  subjectType: string;
+  _id: string;
+  subjectDescription: string;
 }
 
 interface Props {
@@ -22,10 +25,30 @@ const SubjectsTable: React.FC<Props> = ({ subjects, isLoading = false }) => {
     return <p>No Subjects Available.</p>;
   }
 
+  const [isOpen, setIsOpen] = useState(false);
+  const [clickedSub, setClickedSub] = useState({});
+
+  const onClick = (subject: React.SetStateAction<{}>) => {
+    setClickedSub(subject);
+    setIsOpen(true);
+  };
+
+  const onClose = () => {
+    setIsOpen(false);
+  };
+
+  useEffect(() => {
+    console.log(clickedSub);
+  }, [clickedSub]);
+
   const router = useRouter();
 
   return (
     <table className="divide-y w-full divide-gray-200">
+      {isOpen && clickedSub && (
+        <SubjectModal isOpen={isOpen} onClose={onClose} subject={clickedSub} />
+      )}
+
       <thead className="bg-gray-50">
         <tr>
           <th
@@ -53,29 +76,36 @@ const SubjectsTable: React.FC<Props> = ({ subjects, isLoading = false }) => {
             Credits
           </th>
           <th scope="col" className="relative px-6 py-3">
-            <span className="sr-only">Edit</span>
+            <span className="sr-only"></span>
           </th>
         </tr>
       </thead>
       <tbody className="bg-white divide-y divide-gray-200">
         {subjects.map((subject) => (
-          <tr key={subject.subjectCode}>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+          <tr key={subject._id}>
+            <td
+              className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer hover:text-indigo-600"
+              onClick={() => onClick(subject)}
+            >
               {subject.subjectCode}
             </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <td
+              className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer hover:text-indigo-600"
+              onClick={() => onClick(subject)}
+            >
               {subject.subjectName}
             </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <td
+              className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer hover:text-indigo-600"
+              onClick={() => onClick(subject)}
+            >
               {subject.subjectType}
             </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <td
+              className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer hover:text-indigo-600"
+              onClick={() => onClick(subject)}
+            >
               {subject.subjectCredits}
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                Edit
-              </a>
             </td>
           </tr>
         ))}

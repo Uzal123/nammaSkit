@@ -4,10 +4,10 @@ import ListOfButton from "../../components/listofbutton";
 import { useQuery } from "@apollo/client";
 import GET_ALL_STUDENTS from "../../graphql/query/getallstudents";
 import StudentsTable from "../../components/studentstable";
-import GET_TEACHERS_BY_ROLE from "../../graphql/query/getteachersbyrole";
 import { useUserStore } from "../../store/auth";
 import TeacherTable from "../../components/teacherstable";
 import { useRouter } from "next/router";
+import GET_ALL_TEACHERS from "../../graphql/query/getallteachers";
 
 const Users = () => {
   const { user } = useUserStore();
@@ -21,15 +21,8 @@ const Users = () => {
   };
 
   const { data, loading, error } = useQuery(
-    listOf === "Students" ? GET_ALL_STUDENTS : GET_TEACHERS_BY_ROLE,
-    {
-      variables: {
-        allowedRoles: listOf === "Teachers" ? ["fa", "hod", "pr"] : null,
-      },
-    }
+    listOf === "Students" ? GET_ALL_STUDENTS : GET_ALL_TEACHERS
   );
-
- 
 
   useEffect(() => {}, [listOf]);
 
@@ -81,10 +74,7 @@ const Users = () => {
               isLoading={loading}
             />
           ) : (
-            <TeacherTable
-              teachers={data?.getTeachersByRole}
-              isLoading={loading}
-            />
+            <TeacherTable teachers={data?.getAllTeachers} isLoading={loading} />
           )}
         </div>
       </div>

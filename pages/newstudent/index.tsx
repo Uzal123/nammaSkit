@@ -42,8 +42,6 @@ interface FormData {
   course: string;
 }
 
-const allowedDepartments: AllowedDepartment[] = ["cse", "me"];
-
 const SignUpForm = () => {
   const [formData, setFormData] = useState<FormData>({
     firstName: "",

@@ -5,7 +5,11 @@ const GET_TEACHER_BY_ID = gql`
     getTeacherByUserId(userId: $userId) {
       teacher {
         _id
-        department
+        department {
+          _id
+          deptName
+          deptCode
+        }
         user {
           firstName
           lastName

@@ -73,8 +73,11 @@ const Navbar: React.FC = () => {
           <RiSettings4Fill />
           Settings
         </Navlink>
-        <Navlink exact href={"/any"}>
-          <ImLanyrd /> Any
+        <Navlink exact href={"/results"}>
+          <ImLanyrd /> Results
+        </Navlink>
+        <Navlink exact href={"/attendance"}>
+          <ImLanyrd /> Attendance
         </Navlink>
       </ul>
     </div>

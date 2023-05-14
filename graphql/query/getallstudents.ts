@@ -13,7 +13,11 @@ const GET_ALL_STUDENTS = gql`
         phone
       }
       usn
-      department
+      department {
+        _id
+        deptName
+        deptCode
+      }
     }
   }
 `;

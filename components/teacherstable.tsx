@@ -11,7 +11,11 @@ interface Teacher {
     phone: string;
     role: string;
   };
-  department: string;
+  department: {
+    _id: string;
+    deptName: string;
+    deptCode: string;
+  };
 }
 
 interface Props {
@@ -30,10 +34,9 @@ const TeacherTable: React.FC<Props> = ({ teachers, isLoading = false }) => {
 
   const router = useRouter();
 
-  const onClick = (userId: string, role: string) => {
+  const onClick = (userId: string) => {
     router.push({
-      pathname: `/profile/q`,
-      query: { id: userId, role: role },
+      pathname: `/teacherprofile/${userId}`,
     });
   };
 
@@ -74,27 +77,27 @@ const TeacherTable: React.FC<Props> = ({ teachers, isLoading = false }) => {
         {teachers.map((teacher) => (
           <tr key={teacher.user._id}>
             <td
-              className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-              onClick={() => onClick(teacher.user._id, teacher.user.role)}
+              className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer hover:text-indigo-600"
+              onClick={() => onClick(teacher.user._id)}
             >
               {teacher.user.firstName + " " + teacher.user.lastName}
             </td>
             <td
-              className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-              onClick={() => onClick(teacher.user._id, teacher.user.role)}
+              className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer hover:text-indigo-600"
+              onClick={() => onClick(teacher.user._id)}
             >
               {teacher.user.email}
             </td>
             <td
-              className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-              onClick={() => onClick(teacher.user._id, teacher.user.role)}
+              className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer hover:text-indigo-600"
+              onClick={() => onClick(teacher.user._id)}
             >
               {teacher.user.phone}
             </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {teacher.department}
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer hover:text-indigo-600">
+              {teacher.department.deptCode}
             </td>
-            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium cursor-pointer">
               <a href="#" className="text-indigo-600 hover:text-indigo-900">
                 Edit
               </a>

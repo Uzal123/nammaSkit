@@ -33,7 +33,7 @@ const AddSubjectsModal: React.FC<Props> = ({
   const [subjectCode, setSubjectCode] = useState("");
   const [subjectType, setSubjectType] = useState("");
   const [subjectCredits, setSubjectCredits] = useState(0);
-  const subjectDescription = "";
+  const [subjectDescription, setSubjectDescription] = useState("");
 
   const [subjects, setSubjects] = useState<Subject[]>([]);
 
@@ -55,6 +55,7 @@ const AddSubjectsModal: React.FC<Props> = ({
     setSubjectCode("");
     setSubjectType("");
     setSubjectCredits(0);
+    setSubjectDescription("");
   };
 
   const submitSubjects = async () => {
@@ -102,7 +103,7 @@ const AddSubjectsModal: React.FC<Props> = ({
           isOpen ? "translate-y-0" : "translate-y-full"
         } fixed bottom-0 left-0 right-0  z-50 transition-all duration-300 transform w-screen flex justify-center items-center h-screen`}
       >
-        <div className="w-1/2 bg-white p-6 h-full overflow-y-scroll">
+        <div className="w-1/2 bg-white p-6">
           <div className="px-4 py-6">
             <h2 className="text-2xl font-bold mb-4">Add Subjects</h2>
             <form onSubmit={handleSubmit} className="">
@@ -173,6 +174,22 @@ const AddSubjectsModal: React.FC<Props> = ({
                   />
                 </div>
               </div>
+              <div className="mb-4">
+                <label
+                  htmlFor="subjectCredits"
+                  className="block text-gray-700 font-bold mb-2"
+                >
+                  Subject Description
+                </label>
+                <input
+                  id="subjectDescription"
+                  type="text"
+                  value={subjectDescription}
+                  onChange={(e) => setSubjectDescription(e.target.value)}
+                  className="border border-gray-400 p-2 w-full"
+                  required
+                />
+              </div>
 
               <div className="flex justify-end">
                 <button
@@ -200,20 +217,24 @@ const AddSubjectsModal: React.FC<Props> = ({
                     <div className="flex w-full">
                       <h3 className="font-semibold w-1/3">Subject Code</h3>
                       <h3 className="font-semibold w-1/3">Subject Name</h3>
-                      <h3 className="font-semibold w-1/3">Remove</h3>
+                      <h3 className="font-semibold w-1/3"></h3>
                     </div>
 
                     <div>
                       {subjects.map((subject, index) => (
-                        <div className="flex gap-4 w-full justify-between">
+                        <div className="flex gap-4 w-full justify-between border-b-2">
                           <p className="w-1/3">{subject.subjectCode}</p>
                           <p className="w-1/3">{subject.subjectName}</p>
                           <p
-                            className="w-1/3 text-lg font-bold cursor-pointer hover:text-red-600"
-                            onClick={() => removeSubject(index)}
+                            className="w-1/3   flex justify-center items-center"
                             key={index}
                           >
-                            <CiSquareRemove />
+                            <button
+                              onClick={() => removeSubject(index)}
+                              className="text-red-600 flex hover:bg-red-600 hover:text-white px-2 py-1 rounded"
+                            >
+                              Remove
+                            </button>
                           </p>
                         </div>
                       ))}

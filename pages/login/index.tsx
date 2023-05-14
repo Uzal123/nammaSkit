@@ -7,7 +7,7 @@ import { useNotificationStore } from "../../store/notification";
 import { v4 as uuidv4 } from "uuid";
 
 const LoginPage = () => {
-  const [loginInput, setLoginInput] = useState({ phone: "", password: "" });
+  const [loginInput, setLoginInput] = useState({ email: "", password: "" });
 
   const router = useRouter();
 
@@ -22,11 +22,6 @@ const LoginPage = () => {
     setLoginInput((prevs) => ({ ...prevs, [key]: val }));
   };
 
-  const handleFloat = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseFloat(e.target.value);
-    const key = e.target.name;
-    setLoginInput((prevs) => ({ ...prevs, [key]: val }));
-  };
   const [login, { data, loading, error }] = useMutation(LOGIN);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -90,18 +85,18 @@ const LoginPage = () => {
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label
-                htmlFor="phone"
+                htmlFor="email"
                 className="block text-sm font-medium text-gray-700"
               >
-                Phone number
+                Email
               </label>
               <div className="mt-1">
                 <input
-                  id="phone"
-                  name="phone"
-                  type="number"
-                  value={loginInput.phone}
-                  onChange={(e) => handleFloat(e)}
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={loginInput.email}
+                  onChange={(e) => handleString(e)}
                   required
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />

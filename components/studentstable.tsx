@@ -12,7 +12,11 @@ interface Student {
     phone: string;
   };
   _id: string;
-  department: string;
+  department: {
+    _id: string;
+    deptName: string;
+    deptCode: string;
+  };
 }
 
 interface Props {
@@ -34,14 +38,11 @@ const StudentTable: React.FC<Props> = ({
     return <p>No students found.</p>;
   }
 
-  const { user } = useUserStore();
-
   const router = useRouter();
 
-  const onClick = (userId: string, role: string) => {
+  const onClick = (userId: string) => {
     router.push({
-      pathname: `/profile/q`,
-      query: { id: userId, role: role },
+      pathname: `/studentprofile/${userId}`,
     });
   };
 
@@ -89,31 +90,31 @@ const StudentTable: React.FC<Props> = ({
         {students.map((student) => (
           <tr key={student.user._id}>
             <td
-              className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 hover:text-indigo-600"
-              onClick={() => onClick(student.user._id, "st")}
+              className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 cursor-pointer hover:text-indigo-600"
+              onClick={() => onClick(student.user._id)}
             >
               {student.usn}
             </td>
             <td
               className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer hover:text-indigo-600"
-              onClick={() => onClick(student.user._id, "st")}
+              onClick={() => onClick(student.user._id)}
             >
               {student.user.firstName + " " + student.user.lastName}
             </td>
             <td
               className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer hover:text-indigo-600"
-              onClick={() => onClick(student.user._id, "st")}
+              onClick={() => onClick(student.user._id)}
             >
               {student.user.email}
             </td>
             <td
               className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer hover:text-indigo-600"
-              onClick={() => onClick(student.user._id, "st")}
+              onClick={() => onClick(student.user._id)}
             >
               {student.user.phone}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {student.department}
+              {student.department.deptCode}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
               {onEdit ? (

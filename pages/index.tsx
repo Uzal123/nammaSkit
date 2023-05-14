@@ -8,15 +8,17 @@ import AdminDashboard from "../adminComponents/adminDashboard";
 const Home: NextPage = () => {
   const { user } = useUserStore();
   return (
-    <AuthLayout>
-      <AppLayout>
-        {user.role === "st" ? (
-          <StudentDashboard />
-        ) : (
-          <AdminDashboard />
-        )}
-      </AppLayout>
-    </AuthLayout>
+    <div>
+      {user.role === "st" ? (
+        <h1>Ram Ram</h1>
+      ) : (
+        <AuthLayout>
+          <AppLayout>
+            <AdminDashboard />
+          </AppLayout>
+        </AuthLayout>
+      )}
+    </div>
   );
 };
 

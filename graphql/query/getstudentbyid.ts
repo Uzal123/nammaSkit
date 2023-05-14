@@ -20,7 +20,11 @@ const GET_STUDENT_BY_ID = gql`
         }
         dob
         category
-        department
+        department {
+          _id
+          deptName
+          deptCode
+        }
         admissionYear
         motherName
         fatherName
