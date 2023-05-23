@@ -222,7 +222,10 @@ const AddSubjectsModal: React.FC<Props> = ({
 
                     <div>
                       {subjects.map((subject, index) => (
-                        <div className="flex gap-4 w-full justify-between border-b-2">
+                        <div
+                          className="flex gap-4 w-full justify-between border-b-2"
+                          key={subject.subjectCode}
+                        >
                           <p className="w-1/3">{subject.subjectCode}</p>
                           <p className="w-1/3">{subject.subjectName}</p>
                           <p

@@ -129,11 +129,11 @@ const StudentProfile: React.FC<Props> = () => {
                     <p className="font-medium">{student?.category}</p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Father's Name:</p>
+                    <p className="text-gray-600">Father&apos;s Name:</p>
                     <p className="font-medium">{student?.fatherName}</p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Mother's Name:</p>
+                    <p className="text-gray-600">Mother&apos;s Name:</p>
                     <p className="font-medium">{student?.motherName}</p>
                   </div>
                   <div>
@@ -195,7 +195,7 @@ const StudentProfile: React.FC<Props> = () => {
                   <p className="font-medium">{student?.parmanentAddress}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600">Parent's Phone:</p>
+                  <p className="text-gray-600">Parent&apos;s Phone:</p>
                   <p className="font-medium">{student?.parentPhone}</p>
                 </div>
               </div>

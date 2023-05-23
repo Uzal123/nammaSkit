@@ -30,6 +30,7 @@ const StudentTable: React.FC<Props> = ({
   students,
   isLoading = false,
 }) => {
+  const router = useRouter();
   if (isLoading) {
     return <p>Loading...</p>;
   }
@@ -37,8 +38,6 @@ const StudentTable: React.FC<Props> = ({
   if (!students || students.length === 0) {
     return <p>No students found.</p>;
   }
-
-  const router = useRouter();
 
   const onClick = (userId: string) => {
     router.push({

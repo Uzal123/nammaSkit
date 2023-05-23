@@ -24,6 +24,7 @@ interface Props {
 }
 
 const TeacherTable: React.FC<Props> = ({ teachers, isLoading = false }) => {
+  const router = useRouter();
   if (isLoading) {
     return <p>Loading...</p>;
   }
@@ -31,8 +32,6 @@ const TeacherTable: React.FC<Props> = ({ teachers, isLoading = false }) => {
   if (!teachers || teachers.length === 0) {
     return <p>No teachers found.</p>;
   }
-
-  const router = useRouter();
 
   const onClick = (userId: string) => {
     router.push({

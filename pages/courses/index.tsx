@@ -130,7 +130,7 @@ const Courses = () => {
               {dept.map((item, index) => {
                 if (item._id === currentDept && item.numberOfSemesters) {
                   return (
-                    <div className="flex text-center">
+                    <div className="flex text-center" key={item._id}>
                       {new Array(item.numberOfSemesters)
                         .fill(null)
                         .map((arr, i) => (
@@ -138,6 +138,7 @@ const Courses = () => {
                             currentSemester={currentSemester}
                             setCurrentSemester={setCurrentSemester}
                             semester={i + 1}
+                            key={i}
                           />
                         ))}
                     </div>

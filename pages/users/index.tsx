@@ -8,6 +8,8 @@ import { useUserStore } from "../../store/auth";
 import TeacherTable from "../../components/teacherstable";
 import { useRouter } from "next/router";
 import GET_ALL_TEACHERS from "../../graphql/query/getallteachers";
+import { client } from "../../graphql/client";
+import GET_TEACHER_BY_ID from "../../graphql/query/getteacherbyid";
 
 const Users = () => {
   const { user } = useUserStore();
@@ -24,11 +26,32 @@ const Users = () => {
     listOf === "Students" ? GET_ALL_STUDENTS : GET_ALL_TEACHERS
   );
 
+  const getProfileById = async () => {
+    try {
+      const { data } = await client.query({
+        query: GET_TEACHER_BY_ID,
+        variables: {
+          userId: user.id,
+        },
+      });
+      console.log(data.getTeacherByUserId.teacher);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {}, [listOf]);
 
   useEffect(() => {
     console.log(data);
   }, [data]);
+
+  useEffect(() => {
+    if (user.role && user.role !== "ad" && user.role !== "st") {
+      console.log("here", { role: user.role });
+      //   getProfileById();
+    }
+  }, [user]);
 
   return (
     <AppLayout>
@@ -39,18 +62,24 @@ const Users = () => {
               {user.role === "ad" ? "Users" : "Department"}
             </p>
 
-            <div>
-              {user.role === "ad" ? (
+            {user.role === "ad" ? (
+              <div className="flex gap-4">
+                <button
+                  className="bg-gray-600 px-4 py-1.5 rounded-md text-white"
+                  onClick={(e) => handleAddNew(e)}
+                >
+                  Import {listOf} from Excel
+                </button>
                 <button
                   className="bg-gray-600 px-4 py-1.5 rounded-md text-white"
                   onClick={(e) => handleAddNew(e)}
                 >
                   Add new {listOf.slice(0, -1)}
                 </button>
-              ) : (
-                ""
-              )}
-            </div>
+              </div>
+            ) : (
+              ""
+            )}
           </div>
           <div className="flex justify-between w-full border-b-2">
             <div className="flex pt-2">

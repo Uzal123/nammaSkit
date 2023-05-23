@@ -356,6 +356,7 @@ const StudentResult: React.FC<Props> = () => {
 
             {resultType.map((type: IRESULTENUM) => (
               <ResultsTable
+                key={type}
                 results={resultsData[type]}
                 isLoading={false}
                 semester={semester}

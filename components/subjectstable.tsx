@@ -17,6 +17,8 @@ interface Props {
 }
 
 const SubjectsTable: React.FC<Props> = ({ subjects, isLoading = false }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [clickedSub, setClickedSub] = useState({});
   if (isLoading) {
     return <p>Loading...</p>;
   }
@@ -24,9 +26,6 @@ const SubjectsTable: React.FC<Props> = ({ subjects, isLoading = false }) => {
   if (!subjects || subjects.length === 0) {
     return <p>No Subjects Available.</p>;
   }
-
-  const [isOpen, setIsOpen] = useState(false);
-  const [clickedSub, setClickedSub] = useState({});
 
   const onClick = (subject: React.SetStateAction<{}>) => {
     setClickedSub(subject);
@@ -36,12 +35,6 @@ const SubjectsTable: React.FC<Props> = ({ subjects, isLoading = false }) => {
   const onClose = () => {
     setIsOpen(false);
   };
-
-  useEffect(() => {
-    console.log(clickedSub);
-  }, [clickedSub]);
-
-  const router = useRouter();
 
   return (
     <table className="divide-y w-full divide-gray-200">
