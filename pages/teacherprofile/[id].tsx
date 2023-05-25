@@ -3,19 +3,21 @@ import { useRouter } from "next/router";
 import { client } from "../../graphql/client";
 import AppLayout from "../../layouts/applayout";
 import GET_TEACHER_BY_ID from "../../graphql/query/getteacherbyid";
+import MAKE_PROCTOR from "../../graphql/mutation/makeProctor";
+import UpdateTeacherModal from "../../modal/UpdateTeacherModal";
 
 type User = {
   firstName: string;
   _id: string;
   role: string;
   email: string;
-  phone: string;
+  phone: number;
   verifiedPhone: boolean;
   gender: string;
   lastName: string;
 };
 
-type Teacher = {
+export type Teacher = {
   _id: string;
   user: User;
   department: {
@@ -40,6 +42,8 @@ const TeacherProfile: React.FC<Props> = () => {
 
   const [teacher, setTeacher] = useState<Teacher | null>(null);
 
+  const [updateModal, setUpdateModal] = useState<boolean>(false);
+
   const [loading, setLoading] = useState<boolean>(true);
 
   const getProfileById = async () => {
@@ -51,8 +55,22 @@ const TeacherProfile: React.FC<Props> = () => {
         },
       });
       console.log(data);
-      setTeacher(data.getTeacherByUserId.teacher);
+      setTeacher(data.getTeacherByUserId.teacher[0]);
       setLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const makeProctor = async () => {
+    try {
+      const { data } = await client.mutate({
+        mutation: MAKE_PROCTOR,
+        variables: {
+          _id: teacher?._id,
+          role: "pr",
+        },
+      });
     } catch (error) {
       console.log(error);
     }
@@ -72,6 +90,12 @@ const TeacherProfile: React.FC<Props> = () => {
           <div className="h-4/5">Loading...</div>
         ) : (
           <Fragment>
+            <UpdateTeacherModal
+              isOpen={updateModal}
+              teacher={teacher!}
+              onClose={() => setUpdateModal(false)}
+            />
+
             <div className="flex gap-6 px-6 py-2 w-full">
               <div className="bg-white shadow-md rounded px-8 py-6 mb-4 text-center w-2/5">
                 <div className="flex items-center justify-center">
@@ -88,6 +112,7 @@ const TeacherProfile: React.FC<Props> = () => {
                 <p className="text-gray-600 mt-2">
                   {teacher?.department.deptName}
                 </p>
+                <p className="text-gray-600 mt-2">{teacher?.user.role}</p>
               </div>
 
               <div className="bg-white shadow-md rounded px-8 py-6 mb-4 w-2/5">
@@ -115,13 +140,29 @@ const TeacherProfile: React.FC<Props> = () => {
                 </div>
               </div>
               <div className="flex flex-col gap-2 w-1/5">
-                <button className="bg-gray-600 text-white p-2 rounded-sm w-full">
+                <button
+                  className="bg-gray-600 text-white p-2 rounded-sm w-full"
+                  onClick={() => setUpdateModal(true)}
+                >
                   Update Teacher
                 </button>
 
                 <button className="bg-red-600 text-white p-2 rounded-sm">
                   Delete Student
                 </button>
+                {teacher?.user.role === "fa" && (
+                  <button
+                    className="bg-gray-600 text-white p-2 rounded-sm"
+                    onClick={() => makeProctor()}
+                  >
+                    Make Proctor
+                  </button>
+                )}
+                {teacher?.user.role === "pr" && (
+                  <button className="bg-gray-600 text-white p-2 rounded-sm">
+                    See Students
+                  </button>
+                )}
               </div>
             </div>
           </Fragment>

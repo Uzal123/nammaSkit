@@ -10,11 +10,14 @@ import { useRouter } from "next/router";
 import GET_ALL_TEACHERS from "../../graphql/query/getallteachers";
 import { client } from "../../graphql/client";
 import GET_TEACHER_BY_ID from "../../graphql/query/getteacherbyid";
+import ImportUserFromExcel from "../../modal/ImportUsersFromExcel";
 
 const Users = () => {
   const { user } = useUserStore();
   const router = useRouter();
   const [listOf, setListOf] = useState("Students");
+
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleAddNew = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
@@ -55,6 +58,7 @@ const Users = () => {
 
   return (
     <AppLayout>
+      {<ImportUserFromExcel isOpen={isOpen} onClose={() => setIsOpen(false)} />}
       <div className=" rounded-md w-full h-full">
         <div className="flex flex-col w-full justify-center px-10 p-4">
           <div className="flex justify-between">
@@ -66,9 +70,9 @@ const Users = () => {
               <div className="flex gap-4">
                 <button
                   className="bg-gray-600 px-4 py-1.5 rounded-md text-white"
-                  onClick={(e) => handleAddNew(e)}
+                  onClick={(e) => setIsOpen(!isOpen)}
                 >
-                  Import {listOf} from Excel
+                  Import Users from Excel
                 </button>
                 <button
                   className="bg-gray-600 px-4 py-1.5 rounded-md text-white"

@@ -13,6 +13,7 @@ interface Props {
 }
 
 interface Subject {
+  scheme: string;
   subjectName: string;
   subjectCode: string;
   subjectType: string;
@@ -29,6 +30,7 @@ const AddSubjectsModal: React.FC<Props> = ({
   department,
 }) => {
   const { setNotification } = useNotificationStore((state: any) => state);
+  const [scheme, setScheme] = useState("");
   const [subjectName, setSubjectName] = useState("");
   const [subjectCode, setSubjectCode] = useState("");
   const [subjectType, setSubjectType] = useState("");
@@ -42,6 +44,7 @@ const AddSubjectsModal: React.FC<Props> = ({
     setSubjects([
       ...subjects,
       {
+        scheme,
         subjectName,
         subjectCode,
         subjectType,
@@ -51,6 +54,7 @@ const AddSubjectsModal: React.FC<Props> = ({
         subjectDescription,
       },
     ]);
+    setScheme("");
     setSubjectName("");
     setSubjectCode("");
     setSubjectType("");
@@ -105,7 +109,9 @@ const AddSubjectsModal: React.FC<Props> = ({
       >
         <div className="w-1/2 bg-white p-6">
           <div className="px-4 py-6">
-            <h2 className="text-2xl font-bold mb-4">Add Subjects</h2>
+            <h2 className="text-2xl font-bold mb-4">
+              Add Subjects for {semester} Semester
+            </h2>
             <form onSubmit={handleSubmit} className="">
               <div className="grid grid-cols-4 gap-2">
                 <div className="mb-4">
@@ -136,6 +142,22 @@ const AddSubjectsModal: React.FC<Props> = ({
                     type="text"
                     value={subjectCode}
                     onChange={(e) => setSubjectCode(e.target.value)}
+                    className="border border-gray-400 p-2 w-full"
+                    required
+                  />
+                </div>
+                <div className="mb-4">
+                  <label
+                    htmlFor="scheme"
+                    className="block text-gray-700 font-bold mb-2"
+                  >
+                    Scheme
+                  </label>
+                  <input
+                    id="scheme"
+                    type="text"
+                    value={scheme}
+                    onChange={(e) => setScheme(e.target.value)}
                     className="border border-gray-400 p-2 w-full"
                     required
                   />

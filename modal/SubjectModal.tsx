@@ -48,6 +48,15 @@ const SubjectModal: React.FC<Props> = ({ isOpen, onClose, subject }) => {
                   htmlFor="deptCode"
                   className="block text-gray-700 font-bold mb-2"
                 >
+                  <span className="font-semibold">Scheme : </span>
+                  {subject.scheme}
+                </label>
+              </div>
+              <div className="mb-4">
+                <label
+                  htmlFor="deptCode"
+                  className="block text-gray-700 font-bold mb-2"
+                >
                   <span className="font-semibold">Subject Code : </span>
                   {subject.subjectCode}
                 </label>

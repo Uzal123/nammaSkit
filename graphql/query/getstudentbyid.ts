@@ -26,6 +26,7 @@ const GET_STUDENT_BY_ID = gql`
           deptCode
         }
         admissionYear
+        section
         motherName
         fatherName
         parentPhone
@@ -35,6 +36,12 @@ const GET_STUDENT_BY_ID = gql`
         entranceExamMarks
         course
         semester
+        proctor {
+          _id
+          user {
+            _id
+          }
+        }
       }
     }
   }

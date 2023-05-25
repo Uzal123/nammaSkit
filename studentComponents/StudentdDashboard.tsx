@@ -1,30 +1,31 @@
 import { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import GET_STUDENT_BY_ID from "../../graphql/query/getstudentbyid";
-import { client } from "../../graphql/client";
-import AppLayout from "../../layouts/applayout";
-import UpdateStudentModal from "../../modal/UpdateStudentModal";
-import AssignProctorModal from "../../modal/AssignProctorModal";
-import { Teacher } from "../teacherprofile/[id]";
-import GET_TEACHER_BY_ID from "../../graphql/query/getteacherbyid";
+import { client } from "../graphql/client";
+import GET_STUDENT_BY_ID from "../graphql/query/getstudentbyid";
+import UpdateStudentModal from "../modal/UpdateStudentModal";
+import AssignProctorModal from "../modal/AssignProctorModal";
+import { useUserStore } from "../store/auth";
+import AppLayout from "../layouts/applayout";
+import { Teacher } from "../pages/teacherprofile/[id]";
+import GET_TEACHER_BY_ID from "../graphql/query/getteacherbyid";
 
 type User = {
   firstName: string;
   _id: string;
   role: string;
   email: string;
-  phone: number;
+  phone: string;
   verifiedPhone: boolean;
   gender: string;
   lastName: string;
 };
 
-export type Student = {
+type Student = {
   _id: string;
   user: User;
   usn: string;
   currentAddress: string;
-  dob: Date;
+  dob: string;
   category: string;
   department: {
     _id: string;
@@ -40,28 +41,20 @@ export type Student = {
   entranceExamMarks: string;
   parmanentAddress: string;
   course: string;
-  semester: number;
-  section: string;
-  isEligible: boolean;
-  proctor: Teacher | null;
+  proctor?: Teacher;
+  semester: string;
 };
 
-interface Props {
-  student: Student;
-}
-
-const StudentProfile: React.FC<Props> = () => {
+const StudentDashboard = () => {
   const router = useRouter();
 
-  const { id } = router.query;
+  const { user } = useUserStore((state) => state);
 
   const [student, setStudent] = useState<Student | null>(null);
 
-  const [updateModal, setUpdateModal] = useState<boolean>(false);
-
   const [proctor, setProctor] = useState<Teacher | null>(null);
 
-  const [proctorLoading, setProctorLoading] = useState<boolean>(false);
+  const [updateModal, setUpdateModal] = useState<boolean>(false);
 
   const [proctorModal, setProctorModal] = useState<boolean>(false);
 
@@ -72,11 +65,26 @@ const StudentProfile: React.FC<Props> = () => {
       const { data } = await client.query({
         query: GET_STUDENT_BY_ID,
         variables: {
-          userId: id,
+          userId: user.id,
         },
       });
       console.log(data.getStudentByUserId);
       setStudent(data.getStudentByUserId.student);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getProctor = async () => {
+    try {
+      const { data } = await client.query({
+        query: GET_TEACHER_BY_ID,
+        variables: {
+          userId: student?.proctor?._id,
+        },
+      });
+      console.log(data.getTeacherById);
+      setProctor(data.getTeacherById.teacher);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -88,36 +96,25 @@ const StudentProfile: React.FC<Props> = () => {
     setProctorModal(false);
   };
 
-  const getProctorById = async () => {
-    try {
-      const { data } = await client.query({
-        query: GET_TEACHER_BY_ID,
-        variables: {
-          userId: student!.proctor!.user._id,
-        },
-      });
-      if (data.getTeacherByUserId.teacher[0]) {
-        console.log(data.getTeacherByUserId.teacher[0]);
-        setProctor(data.getTeacherByUserId.teacher[0]);
-      }
-    } catch (error) {
-      console.log(error);
+  useEffect(() => {
+    if (user.id) {
+      getProfileById();
     }
-  };
+  }, [user]);
 
   useEffect(() => {
-    getProfileById();
-  }, [id]);
-
-  useEffect(() => {
-    if (student) {
-      if (student.proctor) {
-        getProctorById();
-        console.log("cia");
-        setProctorLoading(false);
-      }
+    if (student?.proctor?._id) {
+      getProctor();
+    } else {
+      setLoading(false);
     }
   }, [student]);
+
+  useEffect(() => {
+    if (proctor) {
+      console.log(student, proctor);
+    }
+  }, [proctor]);
 
   return (
     <AppLayout>
@@ -128,19 +125,10 @@ const StudentProfile: React.FC<Props> = () => {
         ) : (
           <Fragment>
             {updateModal && (
-              <UpdateStudentModal
-                isOpen={updateModal}
-                onClose={onClose}
-                student={student!}
-              />
+              <UpdateStudentModal isOpen={updateModal} onClose={onClose} />
             )}
             {proctorModal && (
-              <AssignProctorModal
-                isOpen={proctorModal}
-                onClose={onClose}
-                dept={student!.department._id}
-                student={student!._id}
-              />
+              <AssignProctorModal isOpen={proctorModal} onClose={onClose} />
             )}
             <div className="flex gap-6 px-6 py-2 w-full">
               <div className="bg-white shadow-md rounded px-8 py-6 mb-4 text-center w-2/5">
@@ -167,7 +155,7 @@ const StudentProfile: React.FC<Props> = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-gray-600">Date of Birth:</p>
-                    <p className="font-medium">{student?.dob.toString()}</p>
+                    <p className="font-medium">{student?.dob}</p>
                   </div>
                   <div>
                     <p className="text-gray-600">Category:</p>
@@ -197,7 +185,10 @@ const StudentProfile: React.FC<Props> = () => {
                 </div>
               </div>
               <div className="flex flex-col gap-2 w-1/5">
-                <button
+                <div>
+                  <img src="" alt="" />
+                </div>
+                {/* <button
                   className="bg-gray-600 text-white p-2 rounded-sm w-full"
                   onClick={() => setUpdateModal(true)}
                 >
@@ -216,61 +207,34 @@ const StudentProfile: React.FC<Props> = () => {
                 </button>
                 <button
                   className="bg-gray-600 text-white p-2 rounded-sm"
-                  onClick={() => router.push(`/results/${id}`)}
+                  onClick={() => router.push(`/results/${user.id}`)}
                 >
                   View Results
                 </button>
                 <button className="bg-red-600 text-white p-2 rounded-sm">
                   Delete Student
-                </button>
+                </button> */}
               </div>
             </div>
-            <div className="flex gap-6 py-2 w-full">
-              <div className="bg-white shadow-md rounded px-8 py-6 mx-6">
-                <h3 className="text-lg font-medium text-gray-800 mb-4">
-                  Contact Information
-                </h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-gray-600">Current Address:</p>
-                    <p className="font-medium">{student?.currentAddress}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600">Permanent Address:</p>
-                    <p className="font-medium">{student?.parmanentAddress}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600">Parent&apos;s Phone:</p>
-                    <p className="font-medium">{student?.parentPhone}</p>
-                  </div>
+
+            <div className="bg-white shadow-md rounded px-8 py-6 mb-4 mx-6">
+              <h3 className="text-lg font-medium text-gray-800 mb-4">
+                Contact Information
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-gray-600">Current Address:</p>
+                  <p className="font-medium">{student?.currentAddress}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Permanent Address:</p>
+                  <p className="font-medium">{student?.parmanentAddress}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Parent&apos;s Phone:</p>
+                  <p className="font-medium">{student?.parentPhone}</p>
                 </div>
               </div>
-              {student?.proctor === null
-                ? "No Proctor Assigned"
-                : !proctorLoading && (
-                    <div className="bg-white shadow-md rounded px-8 py-6 text-center">
-                      <h2 className="text-xl font-medium text text-gray-800">
-                        Proctor
-                      </h2>
-                      <div className="flex items-center justify-center">
-                        <div className="rounded-full w-32 h-32 overflow-hidden">
-                          <img
-                            className="w-full h-full object-cover"
-                            src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80"
-                            alt="Profile"
-                          />
-                        </div>
-                      </div>
-                      <h2 className="text-xl font-medium text text-gray-800 mt-4">{`${proctor?.user.firstName} ${proctor?.user.lastName}`}</h2>
-
-                      <p className="text-gray-600 mt-2">
-                        {proctor?.user.phone}
-                      </p>
-                      <p className="text-gray-600 mt-2">
-                        {student?.department.deptName}
-                      </p>
-                    </div>
-                  )}
             </div>
           </Fragment>
         )}
@@ -279,4 +243,4 @@ const StudentProfile: React.FC<Props> = () => {
   );
 };
 
-export default StudentProfile;
+export default StudentDashboard;

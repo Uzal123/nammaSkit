@@ -8,6 +8,7 @@ import AssignProctorModal from "../../modal/AssignProctorModal";
 import GET_RESULT_BY_TYPE_SEM_STU_ID from "../../graphql/query/getResultByTypeSemStuID";
 import { get } from "http";
 import ResultsTable from "../../components/resultstable";
+import GET_STUDENT_BY_USN from "../../graphql/query/getStudentByUsn";
 
 type User = {
   firstName: string;
@@ -131,15 +132,15 @@ const StudentResult: React.FC<Props> = () => {
   const getProfileById = async () => {
     try {
       const { data } = await client.query({
-        query: GET_STUDENT_BY_ID,
+        query: GET_STUDENT_BY_USN,
         variables: {
-          userId: id,
+          usn: id,
         },
       });
-      console.log(data.getStudentByUserId);
+      console.log(data.getStudentByUSN);
       setFetchResultInput({
-        studentId: data.getStudentByUserId.student._id,
-        semester: data.getStudentByUserId.student.semester,
+        studentId: data.getStudentByUSN.student._id,
+        semester: data.getStudentByUSN.student.semester,
         resultType: [
           IRESULTENUM.SEMESTER,
           IRESULTENUM.IA1,
@@ -150,9 +151,9 @@ const StudentResult: React.FC<Props> = () => {
           IRESULTENUM.AS3,
         ],
       });
-      setStudent(data.getStudentByUserId.student);
-      setStudentId(data.getStudentByUserId.student._id);
-      setSemester(data.getStudentByUserId.student.semester);
+      setStudent(data.getStudentByUSN.student);
+      setStudentId(data.getStudentByUSN.student._id);
+      setSemester(data.getStudentByUSN.student.semester);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -253,12 +254,6 @@ const StudentResult: React.FC<Props> = () => {
           <div className="h-4/5">Loading...</div>
         ) : (
           <Fragment>
-            {updateModal && (
-              <UpdateStudentModal isOpen={updateModal} onClose={onClose} />
-            )}
-            {proctorModal && (
-              <AssignProctorModal isOpen={proctorModal} onClose={onClose} />
-            )}
             <div className="flex gap-6 px-6 py-2 h-full w-full">
               <div className="bg-white shadow-md rounded px-8 py-6 mb-4 text-center w-2/5">
                 <div className="flex items-center justify-center">

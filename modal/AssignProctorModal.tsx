@@ -3,34 +3,58 @@ import CREATE_DEPT from "../graphql/mutation/createDept";
 import { client } from "../graphql/client";
 import { useNotificationStore } from "../store/notification";
 import { v4 as uuidv4 } from "uuid";
+import { useQuery } from "@apollo/client";
+import GET_BY_DEPT_ROLE from "../graphql/query/getTeacherByDeptRole";
+import { Teacher } from "../pages/teacherprofile/[id]";
+import ASSIGN_PROCTOR_TO_STUDENT from "../graphql/mutation/assignProctorToStudent";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  dept: string;
+  student: string;
 }
 
-const AssignProctorModal: React.FC<Props> = ({ isOpen, onClose }) => {
+const AssignProctorModal: React.FC<Props> = ({
+  isOpen,
+  onClose,
+  dept,
+  student,
+}) => {
   const { setNotification } = useNotificationStore((state: any) => state);
+
+  const { data, loading, error } = useQuery(GET_BY_DEPT_ROLE, {
+    variables: {
+      departmentId: dept,
+      allowedRoles: ["pr"],
+    },
+  });
+
   const [deptName, setDeptName] = useState("");
   const [deptCode, setDeptCode] = useState("");
   const [numberOfSemesters, setNumberOfSemesters] = useState<number>(0);
 
+  const [proctor, setProctor] = useState("");
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { value } = e.target;
+    setProctor(value);
+  };
+
   const addDepartment = async () => {
     try {
       const response = await client.mutate({
-        mutation: CREATE_DEPT,
+        mutation: ASSIGN_PROCTOR_TO_STUDENT,
         variables: {
-          createDepartmentInput: {
-            deptName,
-            deptCode,
-            numberOfSemesters,
-          },
+          updateStudentInput: { _id: student, proctor: proctor },
         },
       });
-      if (response.data.createDepartment.success) {
+      if (response.data.updateStudent.success) {
         setNotification({
           id: uuidv4(),
-          message: "Department added successfully!",
+          message: "Proctor Assigned successfully!",
           status: "Success",
           duration: 3000,
         });
@@ -39,7 +63,7 @@ const AssignProctorModal: React.FC<Props> = ({ isOpen, onClose }) => {
     } catch (error) {
       setNotification({
         id: uuidv4(),
-        message: "Error adding department!",
+        message: "Error assigning proctor!",
         status: "Error",
         duration: 3000,
       });
@@ -77,14 +101,27 @@ const AssignProctorModal: React.FC<Props> = ({ isOpen, onClose }) => {
                 >
                   Proctor Name
                 </label>
-                <input
-                  id="deptName"
-                  type="text"
-                  value={deptName}
-                  onChange={(e) => setDeptName(e.target.value)}
-                  className="border border-gray-400 p-2 w-full"
+                <select
+                  id="proctor"
+                  name="proctor"
+                  value={proctor}
+                  onChange={handleInputChange}
                   required
-                />
+                  className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
+                >
+                  <option value="">Select a proctor</option>
+                  {!loading &&
+                    data?.getTeachersByDepartmentAndRole?.teacher.map(
+                      (proctor: Teacher) => (
+                        <option key={proctor._id} value={proctor._id}>
+                          {proctor.user.firstName} {proctor.user.lastName}
+                        </option>
+                      )
+                    )}
+                  {!loading &&
+                    data?.getTeachersByDepartmentAndRole?.teacher.length ===
+                      0 && <option value="">No Proctor Found</option>}
+                </select>
               </div>
 
               <div className="flex justify-end">

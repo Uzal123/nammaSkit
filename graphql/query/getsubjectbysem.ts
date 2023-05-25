@@ -16,6 +16,7 @@ const GET_SUBJECT = gql`
         subjectDescription
         subjectType
         subjectCredits
+        scheme
       }
     }
   }

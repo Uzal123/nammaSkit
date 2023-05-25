@@ -13,8 +13,8 @@ type AllowedDepartment = "cse" | "me";
 export interface Department {
   _id: string;
   deptName: string;
-  hod?: string;
-  hodId?: string;
+  deptCode: string;
+  numberOfSemesters: number;
 }
 
 interface FormData {
@@ -30,7 +30,7 @@ interface FormData {
   currentAddress: string | "";
   dob: string | "";
   category: string | "";
-  department: AllowedDepartment;
+  department: string | "";
   admissionYear: string | "";
   fatherName: string | "";
   motherName: string | "";

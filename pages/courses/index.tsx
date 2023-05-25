@@ -12,8 +12,12 @@ import GET_SUBJECT from "../../graphql/query/getsubjectbysem";
 import SubjectsTable from "../../components/subjectstable";
 import AddSubjectsModal from "../../components/newsubjectsmodal";
 import { useUserStore } from "../../store/auth";
+import * as xlsx from "xlsx";
+import { useNotificationStore } from "../../store/notification";
+import { v4 as uuidv4 } from "uuid";
+import CREATE_SUBJECTS from "../../graphql/mutation/createSubjects";
 
-interface Deparment {
+export interface Deparment {
   deptCode: string;
   deptName: string;
   _id: string;
@@ -22,9 +26,12 @@ interface Deparment {
 
 const Courses = () => {
   const { user } = useUserStore((state: any) => state);
+  const { setNotification } = useNotificationStore((state: any) => state);
   const [currentDept, setCurrentDept] = useState<string>("");
   const [isDeptModalOpen, setIsDeptModalOpen] = useState(false);
   const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false);
+
+  let inputref: HTMLInputElement | null;
 
   const [currentSemester, setCurrentSemester] = useState<number>(1);
 
@@ -48,9 +55,80 @@ const Courses = () => {
     }
   };
 
-  const addNewDepartment = async () => {
+  const submitSubjects = async (
+    subjects: {
+      scheme: string;
+      subjectName: string;
+      subjectCode: string;
+      subjectType: string;
+      subjectCredits: number;
+      subjectDescription: string;
+      department: string;
+      semester: number;
+    }[]
+  ) => {
+    console.log(subjects);
     try {
-    } catch (error) {}
+      const response = await client.mutate({
+        mutation: CREATE_SUBJECTS,
+        variables: { createSubjectInput: subjects },
+      });
+
+      if (response.data.createSubjects.success) {
+        setNotification({
+          id: uuidv4(),
+          message: "Subjects added successfully!",
+          status: "Success",
+          duration: 3000,
+        });
+      } else {
+        setNotification({
+          id: uuidv4(),
+          message: response.data.createSubjects.message,
+          status: "Error",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      setNotification({
+        id: uuidv4(),
+        message: "Error adding subjects!",
+        status: "Error",
+        duration: 3000,
+      });
+    }
+  };
+
+  const fileChangedHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("works");
+    const file = e.target.files![0];
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      const data = new Uint8Array(e.target!.result as ArrayBuffer);
+      const workbook = xlsx.read(data, { type: "array" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const sheetData = xlsx.utils.sheet_to_json(sheet);
+
+      const subjects = sheetData.map((row: any) => ({
+        scheme: row.Scheme.toString(),
+        subjectName: row.subjectName,
+        subjectCode: row.subjectCode,
+        subjectType: row.subjectType,
+        subjectCredits: row.subjectCredits,
+        subjectDescription: row.subjectDescription,
+        department: currentDept,
+        semester: row.semester,
+      }));
+
+      submitSubjects(subjects);
+      // Process the sheetData and update the results as needed
+      console.log(sheetData);
+    };
+    reader.readAsArrayBuffer(file);
+    //remove the file from the input
+    if (inputref) inputref.value = "";
   };
 
   const getSubjects = async (currentDept: string, currentSemester: number) => {
@@ -112,13 +190,28 @@ const Courses = () => {
                     />
                   ))}
               </div>
+              <div className="flex gap-4">
+                <button
+                  className=" px-4 hover:bg-gray-400 py-2 text-gray-500 font-medium hover:text-white hover:rounded-lg "
+                  onClick={() => inputref!.click()}
+                >
+                  Import Subjects from Excel
+                </button>
+                <input
+                  type="file"
+                  accept=".xlsx"
+                  hidden={true}
+                  ref={(refParam) => (inputref = refParam)}
+                  onChange={(e) => fileChangedHandler(e)}
+                />
 
-              <button
-                className=" px-4 hover:bg-gray-400 py-2 text-gray-500 font-medium hover:text-white hover:rounded-lg "
-                onClick={() => setIsDeptModalOpen(true)}
-              >
-                Add new Department
-              </button>
+                <button
+                  className=" px-4 hover:bg-gray-400 py-2 text-gray-500 font-medium hover:text-white hover:rounded-lg "
+                  onClick={() => setIsDeptModalOpen(true)}
+                >
+                  Add new Department
+                </button>
+              </div>
             </div>
           )}
 

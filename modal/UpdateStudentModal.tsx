@@ -3,34 +3,88 @@ import CREATE_DEPT from "../graphql/mutation/createDept";
 import { client } from "../graphql/client";
 import { useNotificationStore } from "../store/notification";
 import { v4 as uuidv4 } from "uuid";
+import { Student } from "../pages/studentprofile/[id]";
+import Input from "../components/forminput";
+import UPDATE_STUDENT from "../graphql/mutation/updateStudent";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  student: Student;
 }
 
-const UpdateStudentModal: React.FC<Props> = ({ isOpen, onClose }) => {
+interface FormData {
+  _id: string;
+  email: string;
+  phone: number;
+  currentAddress: string | "";
+  semester: number | "";
+  dob: Date | string | "";
+  section: string | "";
+  category: string | "";
+  isEligible: boolean | "";
+  fatherName: string | "";
+  motherName: string | "";
+  parentPhone: string | "";
+  parentOccupation: string | "";
+  anualIncome: string | "";
+  entranceExamMarks: string | "";
+  parmanentAddress: string | "";
+  course: string | "";
+}
+
+const UpdateStudentModal: React.FC<Props> = ({ isOpen, onClose, student }) => {
+  const [formData, setFormData] = useState<FormData>({
+    _id: student._id,
+    email: student.user.email,
+    phone: student.user.phone,
+    semester: student.semester,
+    currentAddress: student.currentAddress,
+    dob: student.dob,
+    section: student.section,
+    category: student.category,
+    isEligible: student.isEligible,
+    fatherName: student.fatherName,
+    motherName: student.motherName,
+    parentPhone: student.parentPhone,
+    parentOccupation: student.parentOccupation,
+    anualIncome: student.anualIncome,
+    entranceExamMarks: student.entranceExamMarks,
+    parmanentAddress: student.parmanentAddress,
+    course: student.course,
+  });
   const { setNotification } = useNotificationStore((state: any) => state);
   const [deptName, setDeptName] = useState("");
   const [deptCode, setDeptCode] = useState("");
   const [numberOfSemesters, setNumberOfSemesters] = useState<number>(0);
 
-  const addDepartment = async () => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({ ...prevState, [name]: value }));
+  };
+
+  const handleFloat = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseFloat(e.target.value);
+    const key = e.target.name;
+    setFormData((prevState) => ({ ...prevState, [key]: val }));
+  };
+
+  const updateStudent = async () => {
     try {
       const response = await client.mutate({
-        mutation: CREATE_DEPT,
+        mutation: UPDATE_STUDENT,
         variables: {
-          createDepartmentInput: {
-            deptName,
-            deptCode,
-            numberOfSemesters,
+          updateStudentInput: {
+            ...formData,
           },
         },
       });
-      if (response.data.createDepartment.success) {
+      if (response.data.updateStudent.success) {
         setNotification({
           id: uuidv4(),
-          message: "Department added successfully!",
+          message: "Student Updated successfully!",
           status: "Success",
           duration: 3000,
         });
@@ -39,7 +93,7 @@ const UpdateStudentModal: React.FC<Props> = ({ isOpen, onClose }) => {
     } catch (error) {
       setNotification({
         id: uuidv4(),
-        message: "Error adding department!",
+        message: "Error while Updating!",
         status: "Error",
         duration: 3000,
       });
@@ -48,7 +102,7 @@ const UpdateStudentModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    addDepartment();
+    updateStudent();
   };
 
   return (
@@ -70,66 +124,126 @@ const UpdateStudentModal: React.FC<Props> = ({ isOpen, onClose }) => {
               Update Student's Details
             </h2>
             <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label
-                  htmlFor="departmentName"
-                  className="block text-gray-700 font-bold mb-2"
-                >
-                  Current Address
-                </label>
-                <input
-                  id="deptName"
-                  type="text"
-                  value={deptName}
-                  onChange={(e) => setDeptName(e.target.value)}
-                  className="border border-gray-400 p-2 w-full"
+              <div className="grid grid-cols-3 gap-4 overflow-x-scroll">
+                <Input
+                  label="Email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
                   required
                 />
-              </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="deptCode"
-                  className="block text-gray-700 font-bold mb-2"
-                >
-                  Annual Income
-                </label>
-                <input
-                  id="deptCode"
-                  type="text"
-                  value={deptCode}
-                  onChange={(e) => setDeptCode(e.target.value)}
-                  className="border border-gray-400 p-2 w-full"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="numberOfSubjects"
-                  className="block text-gray-700 font-bold mb-2"
-                >
-                  Parent Phone
-                </label>
-                <input
-                  id="numberOfSubjects"
-                  type="number"
-                  value={numberOfSemesters}
-                  onChange={(e) => setNumberOfSemesters(Number(e.target.value))}
-                  className="border border-gray-400 p-2 w-full"
-                  required
-                />
-              </div>
 
-              <div className="mb-4">
-                <label
-                  htmlFor="parentOccupation"
-                  className="block text-gray-700 font-bold mb-2"
-                >
-                  Parent Occupation
-                </label>
-                <input
-                  id="parentOccupation"
+                <Input
+                  label="Phone"
+                  name="phone"
+                  type="number"
+                  value={formData.phone}
+                  onChange={handleFloat}
+                />
+
+                <Input
+                  label="Current Address"
+                  name="currentAddress"
                   type="text"
-                  className="border border-gray-400 p-2 w-full"
+                  value={formData.currentAddress}
+                  onChange={handleInputChange}
+                />
+
+                <Input
+                  label="Semester"
+                  name="semester"
+                  type="number"
+                  value={formData.semester}
+                  onChange={handleFloat}
+                />
+
+                <Input
+                  label="Date of Birth"
+                  name="dob"
+                  type="date"
+                  value={formData.dob.toLocaleString().split("T")[0] || ""}
+                  onChange={handleInputChange}
+                />
+
+                <Input
+                  label="Section"
+                  name="section"
+                  type="text"
+                  value={formData.section || ""}
+                  onChange={handleInputChange}
+                />
+
+                <Input
+                  label="Category"
+                  name="category"
+                  type="text"
+                  value={formData.category || ""}
+                  onChange={handleInputChange}
+                />
+
+                <Input
+                  label="Father's Name"
+                  name="fatherName"
+                  type="text"
+                  value={formData.fatherName || ""}
+                  onChange={handleInputChange}
+                />
+
+                <Input
+                  label="Mother's Name"
+                  name="motherName"
+                  type="text"
+                  value={formData.motherName || ""}
+                  onChange={handleInputChange}
+                />
+
+                <Input
+                  label="Parent's Phone"
+                  name="parentPhone"
+                  type="text"
+                  value={formData.parentPhone || ""}
+                  onChange={handleInputChange}
+                />
+
+                <Input
+                  label="Parent's Occupation"
+                  name="parentOccupation"
+                  type="text"
+                  value={formData.parentOccupation || ""}
+                  onChange={handleInputChange}
+                />
+
+                <Input
+                  label="Annual Income"
+                  name="annualIncome"
+                  type="text"
+                  value={formData.anualIncome || ""}
+                  onChange={handleInputChange}
+                />
+
+                <Input
+                  label="Entrance Exam Marks"
+                  name="entranceExamMarks"
+                  type="text"
+                  value={formData.entranceExamMarks || ""}
+                  onChange={handleInputChange}
+                />
+
+                <Input
+                  label="Permanent Address"
+                  name="permanentAddress"
+                  type="text"
+                  value={formData.parmanentAddress || ""}
+                  onChange={handleInputChange}
+                />
+
+                <Input
+                  label="Course"
+                  name="course"
+                  type="text"
+                  value={formData.course || ""}
+                  onChange={handleInputChange}
                 />
               </div>
 
