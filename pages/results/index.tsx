@@ -3,16 +3,32 @@ import AppLayout from "../../layouts/applayout";
 import { useQuery } from "@apollo/client";
 import GET_ALL_STUDENTS from "../../graphql/query/getallstudents";
 import StudentsTable from "../../components/studentstable";
+import * as xlsx from "xlsx";
+import ImportResultsFromExcel from "../../modal/ImportResultsFromExcel";
+import { useRouter } from "next/router";
 
 const Results = () => {
-  const { data, loading, error } = useQuery(GET_ALL_STUDENTS);
+  const router = useRouter();
 
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const [usn, setUsn] = useState("");
+
+  const findResultByUsn = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    router.push(`/results/${usn}`);
+  };
 
   return (
     <AppLayout>
+      {isOpen && (
+        <ImportResultsFromExcel
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+        />
+      )}
       <div className=" rounded-md w-full h-full bg-gray-100">
         <div className="flex flex-col w-full justify-center px-10 p-4">
           <div className="flex justify-between">
@@ -25,8 +41,17 @@ const Results = () => {
               <p className="font-semibold text-lg">
                 Search for results with USN
               </p>
-              <input type="text" className="border-2 w-full p-2 rounded-md" />
-              <button className="bg-blue-500 text-white py-2 px-4 rounded">
+              <input
+                type="text"
+                name="usn"
+                className="border-2 w-full p-2 rounded-md"
+                onChange={(e) => setUsn(e.target.value)}
+              />
+              <button
+                className="bg-blue-500 text-white py-2 px-4 rounded disabled:opacity-50"
+                onClick={(e) => findResultByUsn(e)}
+                disabled={usn.length !== 10}
+              >
                 Search
               </button>
             </form>
@@ -34,16 +59,14 @@ const Results = () => {
               <p className="font-semibold text-lg">
                 Upload Class Result from Excel
               </p>
-              <button className="bg-blue-500 text-white py-2 px-4 rounded">
+              <button
+                className="bg-blue-500 text-white py-2 px-4 rounded"
+                onClick={() => setIsOpen(!isOpen)}
+              >
                 Upload
               </button>
             </div>
           </div>
-
-          <div>
-            <p className="font-semibold text-lg py-3">Students</p>
-          </div>
-          <StudentsTable students={data?.getAllStudents} isLoading={loading} />
         </div>
       </div>
     </AppLayout>
