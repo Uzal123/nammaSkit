@@ -4,7 +4,7 @@ import AppLayout from "../../layouts/applayout";
 const Attendance = () => {
   return (
     <AppLayout>
-      <div className=" rounded-md w-full h-full bg-gray-100">
+      {/* <div className=" rounded-md w-full h-full bg-gray-100">
         <div className="flex flex-col w-full justify-center px-10 p-4">
           <div className="flex justify-between">
             <p className="font-semibold text-lg">Results Management</p>
@@ -34,8 +34,11 @@ const Attendance = () => {
           <div>
             <p className="font-semibold text-lg py-3">Students</p>
           </div>
-          {/* <StudentsTable students={data?.getAllStudents} isLoading={loading} /> */}
         </div>
+      </div> */}
+      <div className="flex h-full w-full justify-center items-center text-2xl flex-col">
+        <h2 className="text-lg">Sorry !!!</h2>
+        <h1>Page Under Development</h1>
       </div>
     </AppLayout>
   );

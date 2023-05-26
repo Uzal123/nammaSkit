@@ -105,7 +105,7 @@ const AddDepartmentModal: React.FC<Props> = ({ isOpen, onClose }) => {
                   htmlFor="numberOfSubjects"
                   className="block text-gray-700 font-bold mb-2"
                 >
-                  Number of Subjects
+                  Number of Semesters
                 </label>
                 <input
                   id="numberOfSubjects"

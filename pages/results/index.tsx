@@ -4,11 +4,14 @@ import { useQuery } from "@apollo/client";
 import GET_ALL_STUDENTS from "../../graphql/query/getallstudents";
 import StudentsTable from "../../components/studentstable";
 import * as xlsx from "xlsx";
+import { useUserStore } from "../../store/auth";
 import ImportResultsFromExcel from "../../modal/ImportResultsFromExcel";
 import { useRouter } from "next/router";
 
 const Results = () => {
   const router = useRouter();
+
+  const { user } = useUserStore();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -55,17 +58,19 @@ const Results = () => {
                 Search
               </button>
             </form>
-            <div className="flex flex-col gap-4 bg-white p-6 items-center justify-center">
-              <p className="font-semibold text-lg">
-                Upload Class Result from Excel
-              </p>
-              <button
-                className="bg-blue-500 text-white py-2 px-4 rounded"
-                onClick={() => setIsOpen(!isOpen)}
-              >
-                Upload
-              </button>
-            </div>
+            {user.role === "fa" && (
+              <div className="flex flex-col gap-4 bg-white p-6 items-center justify-center">
+                <p className="font-semibold text-lg">
+                  Upload Class Result from Excel
+                </p>
+                <button
+                  className="bg-blue-500 text-white py-2 px-4 rounded"
+                  onClick={() => setIsOpen(!isOpen)}
+                >
+                  Upload
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

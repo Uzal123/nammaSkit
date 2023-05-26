@@ -21,10 +21,9 @@ interface FormData {
   firstName: string;
   lastName: string;
   email: string;
-  password: string;
-  role: "st";
+  section: string;
   phone: number | "";
-  semester: string | "";
+  semester: number | "";
   gender: string | "";
   usn: string | "";
   currentAddress: string | "";
@@ -45,10 +44,9 @@ interface FormData {
 const SignUpForm = () => {
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
+    section: "A",
     lastName: "",
     email: "",
-    password: "",
-    role: "st",
     phone: "",
     semester: "",
     gender: "",
@@ -191,7 +189,7 @@ const SignUpForm = () => {
                 onChange={handleInputChange}
               />
               <Input
-                label="Email"
+                label="Email for Login"
                 name="email"
                 type="email"
                 value={formData.email}
@@ -208,8 +206,15 @@ const SignUpForm = () => {
               <Input
                 label="Semester"
                 name="semester"
-                type="text"
+                type="number"
                 value={formData.semester}
+                onChange={handleFloat}
+              />
+              <Input
+                label="Section"
+                name="section"
+                type="text"
+                value={formData.section}
                 onChange={handleInputChange}
               />
               <div className="mb-4">
@@ -235,6 +240,7 @@ const SignUpForm = () => {
                   ))}
                 </select>
               </div>
+
               <Input
                 label="Course"
                 name="course"
@@ -362,26 +368,6 @@ const SignUpForm = () => {
                   className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
                 />
               </div>
-            </div>
-            <div className="w-1/3">
-              <div className="flex w-full py-2 mb-2 border-b-2">
-                <h2 className="font-semibold text-lg text-gray-700">
-                  Login Details
-                </h2>
-              </div>
-              <p className="py-1">
-                Phone number for Login :{" "}
-                <span className="font-semibold">{formData.phone}</span>
-              </p>
-
-              <Input
-                label="Password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
-              />
             </div>
 
             <div className="col-span-3">

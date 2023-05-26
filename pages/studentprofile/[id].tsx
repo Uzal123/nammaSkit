@@ -6,7 +6,11 @@ import AppLayout from "../../layouts/applayout";
 import UpdateStudentModal from "../../modal/UpdateStudentModal";
 import AssignProctorModal from "../../modal/AssignProctorModal";
 import { Teacher } from "../teacherprofile/[id]";
+import { useNotificationStore } from "../../store/notification";
 import GET_TEACHER_BY_ID from "../../graphql/query/getteacherbyid";
+import { v4 as uuidv4 } from "uuid";
+import ASSIGN_PROCTOR_TO_STUDENT from "../../graphql/mutation/assignProctorToStudent";
+import { stat } from "fs";
 
 type User = {
   firstName: string;
@@ -52,6 +56,8 @@ interface Props {
 
 const StudentProfile: React.FC<Props> = () => {
   const router = useRouter();
+
+  const { setNotification } = useNotificationStore((state) => state);
 
   const { id } = router.query;
 
@@ -102,6 +108,38 @@ const StudentProfile: React.FC<Props> = () => {
       }
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const changeEligibility = async () => {
+    try {
+      const response = await client.mutate({
+        mutation: ASSIGN_PROCTOR_TO_STUDENT,
+        variables: {
+          updateStudentInput: {
+            _id: student?._id,
+            isEligible: !student!.isEligible,
+          },
+        },
+      });
+      console.log(response);
+      if (response.data.updateStudent.success) {
+        setNotification({
+          id: uuidv4(),
+          message: "Eligibility Changed successfully!",
+          status: "Success",
+          duration: 3000,
+        });
+        onClose();
+      }
+    } catch (error) {
+      console.log(error);
+      setNotification({
+        id: uuidv4(),
+        message: "Error",
+        status: "Error",
+        duration: 3000,
+      });
     }
   };
 
@@ -159,6 +197,11 @@ const StudentProfile: React.FC<Props> = () => {
                 <p className="text-gray-600 mt-2">
                   {student?.department.deptName}
                 </p>
+                <p className="text-gray-600 mt-2">
+                  {student?.semester.toString() +
+                    " Semester -" +
+                    student?.section}
+                </p>
               </div>
               <div className="bg-white shadow-md rounded px-8 py-6 mb-4 w-2/5">
                 <h3 className="text-lg font-medium text-gray-800 mb-4">
@@ -167,7 +210,9 @@ const StudentProfile: React.FC<Props> = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-gray-600">Date of Birth:</p>
-                    <p className="font-medium">{student?.dob.toString()}</p>
+                    <p className="font-medium">
+                      {student?.dob.toLocaleString().split("T")[0]}
+                    </p>
                   </div>
                   <div>
                     <p className="text-gray-600">Category:</p>
@@ -216,10 +261,28 @@ const StudentProfile: React.FC<Props> = () => {
                 </button>
                 <button
                   className="bg-gray-600 text-white p-2 rounded-sm"
-                  onClick={() => router.push(`/results/${id}`)}
+                  onClick={() => router.push(`/results/${student!.usn}`)}
                 >
                   View Results
                 </button>
+                <button className="bg-gray-600 text-white p-2 rounded-sm">
+                  Promote Student
+                </button>
+                <button
+                  className="bg-gray-600 text-white p-2 rounded-sm"
+                  onClick={() => changeEligibility()}
+                >
+                  Change Eligibility
+                </button>
+                <div className="w-full text-center">
+                  <h2>Eligibilty for Exam:</h2>
+
+                  {student?.isEligible ? (
+                    <p className="text-green-600 font-medium">Eligible</p>
+                  ) : (
+                    <p className="text-red-600 font-medium">Not Eligible</p>
+                  )}
+                </div>
                 <button className="bg-red-600 text-white p-2 rounded-sm">
                   Delete Student
                 </button>

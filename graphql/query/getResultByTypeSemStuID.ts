@@ -18,6 +18,7 @@ const GET_RESULT_BY_TYPE_SEM_STU_ID = gql`
           subjectName
           subjectCode
           subjectCredits
+          semester
         }
         resultType
         obtainedMark

@@ -27,10 +27,16 @@ const Topbar: React.FC = () => {
 
       <div className="flex items-center gap-2 w-1/6 justify-center">
         <div className="flex items-center gap-2 cursor-pointer">
-          <div className="rounded-full h-10 w-10 bg-gray-600"></div>
+          <div className="rounded-full w-10 h-10 overflow-hidden">
+            <img
+              className="w-full h-full object-cover"
+              src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80"
+              alt="Profile"
+            />
+          </div>
           <div>
             <p className="font-semibold">{user.firstName}</p>
-            {user.role && <p className="text-xs">Role: {user.role}</p>}
+            {/* {user.role && <p className="text-xs">Role: {user.role}</p>} */}
           </div>
         </div>
 
@@ -42,12 +48,11 @@ const Topbar: React.FC = () => {
           <div className="absolute top-12 right-0 bg-white w-32 h-32 rounded-md shadow-md">
             <div className="flex flex-col items-center justify-center h-full gap-2">
               <p
-                className="text-sm cursor-pointer"
-                onClick={() => router.push(`/profile/${user.id}`)}
+                className="text-sm cursor-pointer hover:bg-blue-600 w-full text-center p-2 hover:text-white flex items-center justify-center gap-2"
+                onClick={() => router.push("/settings")}
               >
-                Profile
+                Settings
               </p>
-              <p className="text-sm cursor-pointer">Settings</p>
               <p
                 className="text-sm cursor-pointer hover:bg-red-600 w-full text-center p-2 hover:text-white flex items-center justify-center gap-2"
                 onClick={() => {

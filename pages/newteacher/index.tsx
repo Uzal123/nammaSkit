@@ -9,15 +9,12 @@ import CREATE_TEACHER from "../../graphql/mutation/createTeacher";
 import GET_ALL_DEPTS from "../../graphql/query/getalldepartments";
 import { Department } from "../newstudent";
 
-type AllowedDepartment = "cse" | "me";
-
 type AllowedRole = "fa" | "hod" | "pr";
 
 interface FormData {
   firstName: string;
   lastName: string;
   email: string;
-  password: string;
   role: AllowedRole;
   phone: number | "";
   gender: string | "";
@@ -28,7 +25,6 @@ interface FormData {
   experience: string | "";
 }
 
-
 const allowedRoles: AllowedRole[] = ["fa", "hod", "pr"];
 
 const SignUpForm = () => {
@@ -36,18 +32,17 @@ const SignUpForm = () => {
     firstName: "",
     lastName: "",
     email: "",
-    password: "",
     role: "fa",
     phone: "",
     gender: "",
     address: "",
-    department: "cse",
+    department: "",
     designation: "",
     qualification: "",
     experience: "",
   });
 
-   const [departments, setDepartments] = useState<Department[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
 
   const { setNotification } = useNotificationStore((state: any) => state);
 
@@ -256,26 +251,6 @@ const SignUpForm = () => {
                 type="text"
                 value={formData.address}
                 onChange={handleInputChange}
-              />
-            </div>
-            <div className="w-1/3">
-              <div className="flex w-full py-2 mb-2 border-b-2">
-                <h2 className="font-semibold text-lg text-gray-700">
-                  Login Details
-                </h2>
-              </div>
-              <p className="py-1">
-                Phone number for Login :{" "}
-                <span className="font-semibold">{formData.phone}</span>
-              </p>
-
-              <Input
-                label="Password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
               />
             </div>
 

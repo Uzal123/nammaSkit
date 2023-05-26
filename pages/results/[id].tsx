@@ -7,6 +7,7 @@ import UpdateStudentModal from "../../modal/UpdateStudentModal";
 import AssignProctorModal from "../../modal/AssignProctorModal";
 import GET_RESULT_BY_TYPE_SEM_STU_ID from "../../graphql/query/getResultByTypeSemStuID";
 import { get } from "http";
+import { useUserStore } from "../../store/auth";
 import ResultsTable from "../../components/resultstable";
 import GET_STUDENT_BY_USN from "../../graphql/query/getStudentByUsn";
 
@@ -42,6 +43,7 @@ type Student = {
   entranceExamMarks: string;
   parmanentAddress: string;
   course: string;
+  section: string;
   semester: string;
 };
 
@@ -93,6 +95,7 @@ interface ResultsData {
 const StudentResult: React.FC<Props> = () => {
   const router = useRouter();
 
+  const { user } = useUserStore();
   const { id } = router.query;
 
   const [student, setStudent] = useState<Student | null>(null);
@@ -101,14 +104,12 @@ const StudentResult: React.FC<Props> = () => {
 
   const [semester, setSemester] = useState<number>();
 
-  const [resultTypeValue, setResultTypeValue] = useState<String>("ALL");
-
-  const [resultType, setResultType] = useState<IRESULTENUM[]>([]);
+  const [resultSem, setResultSem] = useState<number>();
 
   const [fetchResultInput, setFetchResultInput] = useState({
     studentId: "",
     semester: semester,
-    resultType: resultType,
+    resultType: ["IA1", "IA2", "IA3", "SEMESTER", "AS1", "AS2", "AS3"],
   });
 
   const [result, setResult] = useState<result[]>([]);
@@ -141,15 +142,7 @@ const StudentResult: React.FC<Props> = () => {
       setFetchResultInput({
         studentId: data.getStudentByUSN.student._id,
         semester: data.getStudentByUSN.student.semester,
-        resultType: [
-          IRESULTENUM.SEMESTER,
-          IRESULTENUM.IA1,
-          IRESULTENUM.IA2,
-          IRESULTENUM.IA3,
-          IRESULTENUM.AS1,
-          IRESULTENUM.AS2,
-          IRESULTENUM.AS3,
-        ],
+        resultType: ["SEMESTER", "IA1", "IA2", "IA3", "AS1", "AS2", "AS3"],
       });
       setStudent(data.getStudentByUSN.student);
       setStudentId(data.getStudentByUSN.student._id);
@@ -167,11 +160,13 @@ const StudentResult: React.FC<Props> = () => {
         variables: {
           fetchResultInput: fetchResultInput,
         },
+        fetchPolicy: "no-cache",
       });
 
       if (response.data.getResultsByresultTypeAndSemester.success) {
         setResult(response.data.getResultsByresultTypeAndSemester.results);
       }
+      setResultSem(semester);
     } catch (error) {
       console.log(error);
     }
@@ -198,34 +193,30 @@ const StudentResult: React.FC<Props> = () => {
   }, [student]);
 
   useEffect(() => {
-    if (resultTypeValue === "ALL") {
-      setResultType([
-        IRESULTENUM.AS1,
-        IRESULTENUM.IA1,
-        IRESULTENUM.AS2,
-        IRESULTENUM.IA2,
-        IRESULTENUM.AS2,
-        IRESULTENUM.IA3,
-        IRESULTENUM.AS3,
-        IRESULTENUM.SEMESTER,
-      ]);
-    } else {
-      setResultType([resultTypeValue as IRESULTENUM]);
-    }
-  }, [resultTypeValue]);
-
-  useEffect(() => {
-    if (studentId && semester && resultType.length > 0) {
+    if (studentId && semester) {
       setFetchResultInput({
         studentId: studentId,
         semester: semester,
-        resultType,
+        resultType: ["IA1", "IA2", "IA3", "SEMESTER", "AS1", "AS2", "AS3"],
       });
     }
-  }, [studentId, semester, resultType]);
+  }, [studentId, semester]);
+
+  const resetResult = () => {
+    let data: ResultsData = {
+      IA1: [],
+      IA2: [],
+      IA3: [],
+      SEMESTER: [],
+      AS1: [],
+      AS2: [],
+      AS3: [],
+    };
+
+    setResultsData(data);
+  };
 
   useEffect(() => {
-    console.log({ result });
     if (result.length > 0) {
       let data: ResultsData = {
         IA1: [],
@@ -248,7 +239,7 @@ const StudentResult: React.FC<Props> = () => {
     <AppLayout>
       <div className="flex flex-col justify-center bg-gray-100">
         <h2 className="font-semibold text-2xl px-6 py-2 h-full">
-          Student Profile
+          {student?.user.firstName + " " + student?.user.lastName + " "}Result
         </h2>
         {loading ? (
           <div className="h-4/5">Loading...</div>
@@ -271,12 +262,17 @@ const StudentResult: React.FC<Props> = () => {
                 <p className="text-gray-600 mt-2">
                   {student?.department.deptName}
                 </p>
+                <p className="text-gray-600 mt-2">
+                  {student?.semester.toString() +
+                    " Semester -" +
+                    student?.section}
+                </p>
               </div>
               <div className="bg-white shadow-md rounded px-8 py-6 mb-4 w-2/5">
                 <h3 className="text-lg font-medium text-gray-800 mb-4">
-                  Select Semester and Result Type
+                  Select Semester
                 </h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-4">
                   <div>
                     <p className="text-gray-600">Semester</p>
                     <select
@@ -295,26 +291,13 @@ const StudentResult: React.FC<Props> = () => {
                     </select>
                   </div>
                   <div>
-                    <p className="text-gray-600">Result Type</p>
-                    <select
-                      className="border border-gray-300 rounded w-full p-2"
-                      value={resultTypeValue.toString()}
-                      onChange={(e) => setResultTypeValue(e.target.value)}
-                    >
-                      <option value="ALL">All</option>
-                      <option value="SEMESTER">External Results</option>
-                      <option value="IA1">1st Internal</option>
-                      <option value="IA2">2nd Internal</option>
-                      <option value="IA3">3rd Internal</option>
-                      <option value="AS1">1st Assignment</option>
-                      <option value="AS2">2nd Assignment</option>
-                      <option value="AS3">3rd Assignment</option>
-                    </select>
-                  </div>
-                  <div>
                     <button
                       className="bg-gray-600 text-white p-2 rounded-sm w-full"
-                      onClick={() => getResults()}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        resetResult();
+                        getResults();
+                      }}
                     >
                       See Results
                     </button>
@@ -324,40 +307,34 @@ const StudentResult: React.FC<Props> = () => {
               <div className="flex flex-col gap-2 w-1/5">
                 <button
                   className="bg-gray-600 text-white p-2 rounded-sm w-full"
-                  onClick={() => setUpdateModal(true)}
+                  onClick={() =>
+                    user.role === "st"
+                      ? router.push(`/`)
+                      : router.push(`/studentprofile/${student?.user._id}`)
+                  }
                 >
-                  Update Student
+                  View Profile
                 </button>
 
                 <button
                   className="bg-gray-600 text-white p-2 rounded-sm"
-                  onClick={() => setProctorModal(true)}
+                  onClick={() => router.push("/attendance")}
                 >
-                  Assign Proctor
-                </button>
-
-                <button className="bg-gray-600 text-white p-2 rounded-sm">
                   View Attendance
-                </button>
-                <button className="bg-gray-600 text-white p-2 rounded-sm">
-                  View Results
-                </button>
-                <button className="bg-red-600 text-white p-2 rounded-sm">
-                  Delete Student
                 </button>
               </div>
             </div>
             <h2 className="font-semibold text-2xl px-6 py-2 h-full">Results</h2>
-
-            {resultType.map((type: IRESULTENUM) => (
-              <ResultsTable
-                key={type}
-                results={resultsData[type]}
-                isLoading={false}
-                semester={semester}
-                resultType={type}
-              />
-            ))}
+            <ResultsTable
+              ia1={resultsData.IA1}
+              ia2={resultsData.IA2}
+              ia3={resultsData.IA3}
+              as1={resultsData.AS1}
+              as2={resultsData.AS2}
+              as3={resultsData.AS3}
+              semester={resultSem}
+              semesterResult={resultsData.SEMESTER}
+            />
           </Fragment>
         )}
       </div>

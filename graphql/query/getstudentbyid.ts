@@ -32,6 +32,8 @@ const GET_STUDENT_BY_ID = gql`
         parentPhone
         parentOccupation
         anualIncome
+        isEligible
+        section
         parmanentAddress
         entranceExamMarks
         course
