@@ -28,7 +28,7 @@ const authLink = setContext((_, {
 
 
 const httpLink = createUploadLink({
-    uri: "http://localhost:8080/graphql",
+    uri: "http://ec2-65-2-83-47.ap-south-1.compute.amazonaws.com/api",
 })
 
 export const client = new ApolloClient({
