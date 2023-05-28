@@ -28,7 +28,7 @@ const authLink = setContext((_, {
 
 
 const httpLink = createUploadLink({
-    uri: "http://ec2-65-2-83-47.ap-south-1.compute.amazonaws.com/api",
+    uri: "https://api.nammaskit.live/api",
 })
 
 export const client = new ApolloClient({
