@@ -3,15 +3,15 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 ## Getting Started
 
 ## Admin Login
- -Email: admin@skit.com
+ -Email: admin@skit.com<br>
  -Pass: 123456
 
 ## Teacher Login
-Email: Teacher email from List after admin login.
+Email: Teacher email from List after admin login.<br>
 Pass: skit@teacher
 
 ## Student Login
-Email: Student email from List after admin login.
+Email: Student email from List after admin login.<br>
 Pass: skit@123
 
 First, run the development server:
